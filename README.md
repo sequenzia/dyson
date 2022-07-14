@@ -1,1 +1,1 @@
-# Dyson: Machine Learning Modeling Research & Development
+# Dyson: Modeling/Algorithm Research & Development 
