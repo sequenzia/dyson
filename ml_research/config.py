@@ -1,5 +1,5 @@
 from photon import metrics, losses, optimizers, utils, options
-from models import ens_models, cnn_models
+from models import ens_models, cnn_models, rnn_models
 
 losses = losses.Losses()
 metrics = metrics.Metrics()
@@ -8,7 +8,7 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 250
+n_epochs = 1000
 
 # region: ............ Network ........... #
 
@@ -1242,5 +1242,102 @@ cnn_config = {'name': 'cnn',
               'metrics_config':cnn_metrics_config,
               'run_config': cnn_run_config,
               'save_config': cnn_save_config}
+
+# endregion:
+
+# region: ............ RNNs ............ #
+
+rnn_n_chains = 1
+
+lstm_pool_model_config = [{'model': rnn_models.LSTM_Pool,
+                           'n_models': 1,
+                           'n_outputs': 5,
+                           'args': {'d_model': 512,
+                                    'reg_args': None,
+                                    'norm_args': None,
+                                    'reg_vals': [0],
+                                    'seed': seed,
+                                    'is_prob': False,
+                                    'show_calls': False}}]
+
+lstm_nopool_model_config = [{'model': rnn_models.LSTM_NoPool,
+                             'n_models': 1,
+                             'n_outputs': 5,
+                             'args': {'d_model': 512,
+                                      'reg_args': None,
+                                      'norm_args': None,
+                                      'reg_vals': [0],
+                                      'seed': seed,
+                                      'is_prob': False,
+                                      'show_calls': False}}]
+
+lstm_deep_model_config = [{'model': rnn_models.LSTM_Deep,
+                           'n_models': 1,
+                           'n_outputs': 5,
+                           'args': {'d_model': 512,
+                                    'reg_args': None,
+                                    'norm_args': None,
+                                    'reg_vals': [0],
+                                    'seed': seed,
+                                    'is_prob': False,
+                                    'show_calls': False}}]
+
+rnn_opt_config = [{'fn': optimizers.AdamDynamic,
+                   'args': {'lr_st': 0.01,
+                            'lr_min': 1e-7,
+                            'decay_rate': 1.25,
+                            'static_epochs': [2,2]}}]
+
+rnn_data_config = [{'input_src': 'batch',
+                    'targets': {'is_seq': False,
+                                'split_on': 5}}]
+
+rnn_build_config = [{'strat_type': None,
+                     'dist_type': None,
+                     'pre_build': True,
+                     'load_cp': True,
+                     'save_cp': True}]
+
+rnn_loss_config = [{'fn': losses.categorical_crossentropy,
+                    'args': {'from_logits': True,
+                             'reduction': 'NONE'}}]
+
+rnn_metrics_config = [{'fn': metrics.CatAcc,
+                       'args': {}}]
+
+rnn_save_config = [{'features': None,
+                    'x_tracking': None,
+                    'y_true': 'last',
+                    'y_hat': 'last',
+                    'y_tracking': None,
+                    'step_loss': 'All',
+                    'model_loss': 'All',
+                    'full_loss': 'All',
+                    'metrics': 'All',
+                    'preds': None,
+                    'grads': None,
+                    'learning_rates': 'All'}]
+
+rnn_run_config = [{'run_type': 'fit',
+                   'data_type': 'train',
+                   'val_on': True,
+                   'metrics_on': True,
+                   'pre_build': True,
+                   'load_cp': True,
+                   'save_cp': True,
+                   'async_on': False,
+                   'msgs_on': True}]
+
+rnn_config = {'name': 'rnn',
+              'n_epochs': n_epochs,
+              'n_chains': rnn_n_chains,
+              'model_config': lstm_nopool_model_config,
+              'data_config': rnn_data_config,
+              'build_config': rnn_build_config,
+              'opt_config': rnn_opt_config,
+              'loss_config': rnn_loss_config,
+              'metrics_config':rnn_metrics_config,
+              'run_config': rnn_run_config,
+              'save_config': rnn_save_config}
 
 # endregion:

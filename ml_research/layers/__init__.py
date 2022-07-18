@@ -1,7 +1,7 @@
 from photon import layers as photon_layers
 from tensorflow.keras import layers as tf_layers
 
-class DNN(photon_layers.Layers):
+class Dense(photon_layers.Layers):
 
     def __init__(self, gauge, layer_nm, layer_args, **kwargs):
 
