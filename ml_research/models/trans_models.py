@@ -202,6 +202,18 @@ class Transformer_2(photon_models.Models):
                           'dff': self.d_model,
                           'res_config': enc_res_config}
 
+        dnn_out_args = {'units': 5,
+                        'activation': None,
+                        'use_bias': True,
+                        'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
+                        'bias_initializer': initializers.Zeros(),
+                        'kernel_regularizer': k_reg,
+                        'bias_regularizer': b_reg,
+                        'activity_regularizer': a_reg,
+                        'kernel_constraint': None,
+                        'bias_constraint': None,
+                        'trainable': True}
+
         # -------- bars -------- #
 
         self.enc_bars = trans_layers.EncBars(self.gauge,
@@ -242,19 +254,42 @@ class Transformer_2(photon_models.Models):
                                                reg_config=None,
                                                norm_config=None)
 
+
+        self.pool = photon_layers.Pool(self.gauge,
+                                       layer_nm='pool',
+                                       pool_type='avg',
+                                       is_global=True,
+                                       reg_args=self.reg_args,
+                                       norm_args=self.norm_args)
+
+        self.dnn_out = photon_layers.DNN(self.gauge,
+                                         layer_nm='dnn_out',
+                                         layer_args=dnn_out_args,
+                                         reg_args=None,
+                                         norm_args=None)
+
     def call(self, inputs, **kwargs):
 
-        # targets = args_key_chk(kwargs,'targets')
-        # tracking = args_key_chk(kwargs, 'tracking')
+        targets = args_key_chk(kwargs,'targets')
+        tracking = args_key_chk(kwargs, 'tracking')
+
+        if targets is None:
+            targets = inputs
+        if tracking is None:
+            tracking = inputs
 
         z_enc_bars = self.enc_bars(inputs)
-        # z_dec_bars = self.dec_bars([targets, tracking])
-        #
+        z_dec_bars = self.dec_bars(targets)
+
+
         # z_enc_stack = self.enc_stack(z_enc_bars)
         #
         # z_dec_stack = self.dec_stack([z_dec_bars,z_enc_stack])
 
-        z_out = self.trans_out(z_enc_bars)
+        z_pool = self.pool(z_enc_bars)
+        z_out = self.dnn_out(z_pool)
+
+        # z_out = self.trans_out(z_enc_bars)
 
         self.z_return = {'features': inputs,
                          'y_hat': z_out,

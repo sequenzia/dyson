@@ -1,6 +1,7 @@
 from photon import layers as photon_layers
-import tensorflow as tf
+import tensorflow as tf, numpy as np
 from tensorflow.keras import layers as tf_layers
+from tensorflow import math as tfm
 from photon.utils import args_key_chk
 
 class EncBars(photon_layers.Layers):
@@ -390,51 +391,49 @@ class DecBars(photon_layers.Layers):
 
     def build(self, input_shp):
 
-        self.input_shp = input_shp[0]
+        self.input_shp = input_shp
         self.batch_size = self.input_shp[0]
         self.seq_depth = self.input_shp[1]
-        self.n_cols = self.input_shp[-1]
 
-        self.gauge_dtype = self.gauge.data.dtype
+        self.gauge_dtype = self.gauge.tree.data.dtype
 
         return
 
     def call(self, inputs, training, **kwargs):
 
-        z_inputs = inputs[0]
-        z_tracking = inputs[1]
+        z_data = inputs
 
-        z_data = z_inputs
+        if self.gauge.is_model_built:
 
-        z_sin_pe = None
-        z_seq_pe = None
-        z_intra_pe = None
+            print(z_data.shape)
 
-        z_data = np.repeat(z_data, self.d_model, axis=-1)
+            z_sin_pe = None
+            z_seq_pe = None
+            z_intra_pe = None
 
-        # -- sin pos encoding -- #
-        if self.sin_pe_on:
-            z_sin_pe = self.gen_sin_pe()
-            z_data = z_data + z_sin_pe
+            z_data = np.repeat(z_data, self.d_model, axis=-1)
 
-        z_data = np.roll(z_data, 1, axis=1)
-        z_data[:,0] = 0
-        z_outputs = tf.convert_to_tensor(z_data, dtype=self.gauge_dtype)
+            # -- sin pos encoding -- #
+            if self.sin_pe_on:
+                z_sin_pe = self.gen_sin_pe()
+                z_data = z_data + z_sin_pe
 
-        if self.logs_on:
+            z_data = np.roll(z_data, 1, axis=1)
+            z_data[:,0] = 0
+            z_outputs = tf.convert_to_tensor(z_data, dtype=self.gauge_dtype)
 
-            _log = {
-                'z_inputs': z_inputs,
-                'z_tracking': z_tracking,
-                'z_sin_pe': z_sin_pe,
-                'z_seq_pe': z_seq_pe,
-                'z_intra_pe': z_intra_pe,
-                'z_data': z_data,
-                'z_outputs': z_outputs}
+            if self.logs_on:
 
-            self.save_layer_log(_log)
+                _log = {'z_inputs': inputs,
+                        'z_sin_pe': z_sin_pe,
+                        'z_seq_pe': z_seq_pe,
+                        'z_intra_pe': z_intra_pe,
+                        'z_data': z_data,
+                        'z_outputs': z_outputs}
 
-        return z_outputs
+                self.save_layer_log(_log)
+
+        return z_data
 
     def gen_sin_pe(self):
 

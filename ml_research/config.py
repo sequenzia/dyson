@@ -1029,6 +1029,10 @@ tree_config = {'name': 'Base',
 
 # --------------------- Branches --------------------- #
 
+log_config = {'log_calls': {'main': False, 'val': False},
+              'log_layers': {'main': False, 'val': False},
+              'log_run_data': {'main': False, 'val': False}}
+
 # region: ........... Ensemble ........... #
 
 ens_n_chains = 5
@@ -1357,7 +1361,8 @@ trans_model_config = [{'model': trans_models.Transformer_2,
                                 'reg_vals': [0],
                                 'seed': seed,
                                 'is_prob': False,
-                                'show_calls': False}}]
+                                'show_calls': False,
+                                'log_config': log_config}}]
 
 trans_opt_config = [{'fn': optimizers.AdamDynamic,
                    'args': {'lr_st': 0.01,
