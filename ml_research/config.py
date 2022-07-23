@@ -16,7 +16,7 @@ data_dir = 'data'
 data_fn = 'SPY_1T_2016_2017'
 data_res = 60
 
-x_groups_on = True
+x_groups_on = False
 
 dirs_on = True
 diag_on = False
@@ -597,7 +597,8 @@ zsc_cols = {
                     'nor_on': True,
                     'x_group': 'zsc'}}
 
-x_cols = {**pr_cols, **vol_cols, **atr_cols, **roc_cols, **zsc_cols}
+x_cols = pr_cols
+    # {**pr_cols, **vol_cols, **atr_cols, **roc_cols, **zsc_cols}
 
 c_cols = {
     'tf_yq': {
@@ -936,7 +937,8 @@ data_cols = {
     'x_cols': x_cols,
     'c_cols': c_cols,
     'y_cols': y_cols,
-    't_cols': t_cols}
+    't_cols': t_cols,
+    'f_cols': ['x_cols', 'c_cols']}
 
 float_x = 32
 
@@ -1027,13 +1029,93 @@ tree_config = {'name': 'Base',
 
 # endregion:
 
-# --------------------- Branches --------------------- #
 
-log_config = {'log_calls': {'main': False, 'val': False},
-              'log_layers': {'main': False, 'val': False},
-              'log_run_data': {'main': False, 'val': False}}
+# region: ........... Branch Configs ........... #
 
-# region: ........... Ensemble ........... #
+model_log_config = {'log_calls': {'main': False, 'val': False},
+                    'log_layers': {'main': True, 'val': False},
+                    'log_run_data': {'main': False, 'val': False}}
+
+data_config = [{'input_src': 'batch',
+                'targets': {'is_seq': False,
+                            'split_on': 5},
+                'log_config': {'log_batch_data': {'main': True, 'val': False}}}]
+
+build_config = [{'strat_type': None,
+                 'dist_type': None,
+                 'pre_build': True,
+                 'load_cp': True,
+                 'save_cp': True}]
+
+opt_config = [{'fn': optimizers.AdamDynamic,
+               'args': {'lr_st': 0.01,
+                        'lr_min': 1e-7,
+                        'decay_rate': 1.25,
+                        'static_epochs': [2,2]}}]
+
+loss_config = [{'fn': losses.categorical_crossentropy,
+                'args': {'from_logits': True,
+                         'reduction': 'NONE'}}]
+
+metrics_config = [{'fn': metrics.CatAcc,
+                   'args': {}}]
+
+run_config = [{'run_type': 'fit',
+               'data_type': 'train',
+               'val_on': True,
+               'metrics_on': True,
+               'pre_build': True,
+               'load_cp': True,
+               'save_cp': True,
+               'async_on': False,
+               'msgs_on': True}]
+
+save_config = [{'features': None,
+                'x_tracking': None,
+                'y_true': 'last',
+                'y_hat': 'last',
+                'y_tracking': None,
+                'step_loss': 'All',
+                'model_loss': 'All',
+                'full_loss': 'All',
+                'metrics': 'All',
+                'preds': None,
+                'grads': None,
+                'learning_rates': 'All'}]
+
+# endregion:
+
+# region: ........ Transformers ........ #
+
+trans_n_chains = 1
+
+trans_model_config = [{'model': trans_models.Transformer_2,
+                       'n_models': 1,
+                       'n_outputs': 5,
+                       'args': {'d_model': 512,
+                                'reg_args': None,
+                                'norm_args': None,
+                                'reg_vals': [0],
+                                'seed': seed,
+                                'is_prob': False,
+                                'show_calls': False,
+                                'log_config': model_log_config}}]
+
+trans_config = {'name': 'trans',
+                'n_epochs': n_epochs,
+                'n_chains': trans_n_chains,
+                'model_config': trans_model_config,
+                'data_config': data_config,
+                'build_config': build_config,
+                'opt_config': opt_config,
+                'loss_config': loss_config,
+                'metrics_config': metrics_config,
+                'run_config': run_config,
+                'save_config': save_config}
+
+# endregion:
+
+# region: .......... Ensemble .......... #
 
 ens_n_chains = 5
 
@@ -1345,81 +1427,5 @@ rnn_config = {'name': 'rnn',
               'metrics_config':rnn_metrics_config,
               'run_config': rnn_run_config,
               'save_config': rnn_save_config}
-
-# endregion:
-
-# region: ........ Transformers ........ #
-
-trans_n_chains = 1
-
-trans_model_config = [{'model': trans_models.Transformer_2,
-                       'n_models': 1,
-                       'n_outputs': 5,
-                       'args': {'d_model': 512,
-                                'reg_args': None,
-                                'norm_args': None,
-                                'reg_vals': [0],
-                                'seed': seed,
-                                'is_prob': False,
-                                'show_calls': False,
-                                'log_config': log_config}}]
-
-trans_opt_config = [{'fn': optimizers.AdamDynamic,
-                   'args': {'lr_st': 0.01,
-                            'lr_min': 1e-7,
-                            'decay_rate': 1.25,
-                            'static_epochs': [2,2]}}]
-
-trans_data_config = [{'input_src': 'batch',
-                    'targets': {'is_seq': False,
-                                'split_on': 5}}]
-
-trans_build_config = [{'strat_type': None,
-                     'dist_type': None,
-                     'pre_build': True,
-                     'load_cp': True,
-                     'save_cp': True}]
-
-trans_loss_config = [{'fn': losses.categorical_crossentropy,
-                    'args': {'from_logits': True,
-                             'reduction': 'NONE'}}]
-
-trans_metrics_config = [{'fn': metrics.CatAcc,
-                       'args': {}}]
-
-trans_save_config = [{'features': None,
-                    'x_tracking': None,
-                    'y_true': 'last',
-                    'y_hat': 'last',
-                    'y_tracking': None,
-                    'step_loss': 'All',
-                    'model_loss': 'All',
-                    'full_loss': 'All',
-                    'metrics': 'All',
-                    'preds': None,
-                    'grads': None,
-                    'learning_rates': 'All'}]
-
-trans_run_config = [{'run_type': 'fit',
-                   'data_type': 'train',
-                   'val_on': True,
-                   'metrics_on': True,
-                   'pre_build': True,
-                   'load_cp': True,
-                   'save_cp': True,
-                   'async_on': False,
-                   'msgs_on': True}]
-
-trans_config = {'name': 'trans',
-                'n_epochs': n_epochs,
-                'n_chains': trans_n_chains,
-                'model_config': trans_model_config,
-                'data_config': trans_data_config,
-                'build_config': trans_build_config,
-                'opt_config': trans_opt_config,
-                'loss_config': trans_loss_config,
-                'metrics_config':trans_metrics_config,
-                'run_config': trans_run_config,
-                'save_config': trans_save_config}
 
 # endregion:

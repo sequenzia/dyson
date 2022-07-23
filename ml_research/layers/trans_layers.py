@@ -2,7 +2,7 @@ from photon import layers as photon_layers
 import tensorflow as tf, numpy as np
 from tensorflow.keras import layers as tf_layers
 from tensorflow import math as tfm
-from photon.utils import args_key_chk
+from photon.utils import np_exp, args_key_chk
 
 class EncBars(photon_layers.Layers):
 
@@ -103,16 +103,17 @@ class EncBars(photon_layers.Layers):
                                                layer_args=self.sub_args,
                                                reg_args=self.subs_reg_args,
                                                norm_args=self.subs_norm_args,
-                                               is_child=True)
+                                               is_child=True,
+                                               no_log=True)
 
                 if self.sub_type == 'cnn':
-                    _layer = CNN(
-                        self.gauge,
-                        layer_nm=self.layer_nm + '_cnn_' + str(idx),
-                        layer_args=self.sub_args,
-                        reg_args=self.subs_reg_args,
-                        norm_args=self.subs_norm_args,
-                        is_child=True)
+                    _layer = CNN(self.gauge,
+                                 layer_nm=self.layer_nm + '_cnn_' + str(idx),
+                                 layer_args=self.sub_args,
+                                 reg_args=self.subs_reg_args,
+                                 norm_args=self.subs_norm_args,
+                                 is_child=True,
+                                 no_log=True)
 
                 self.sub_layers.append(_layer)
 
@@ -136,7 +137,8 @@ class EncBars(photon_layers.Layers):
                                                layer_args=self.sub_args,
                                                reg_args=self.subs_reg_args,
                                                norm_args=self.subs_norm_args,
-                                               is_child=True)
+                                               is_child=True,
+                                               no_log=True)
 
                 if self.sub_type == 'cnn':
                     _layer = photon_layers.CNN(self.gauge,
@@ -144,7 +146,8 @@ class EncBars(photon_layers.Layers):
                                                layer_args=self.sub_args,
                                                reg_args=self.subs_reg_args,
                                                norm_args=self.subs_norm_args,
-                                               is_child=True)
+                                               is_child=True,
+                                               no_log=True)
 
                 self.sub_layers.append(_layer)
 
@@ -156,14 +159,16 @@ class EncBars(photon_layers.Layers):
                                                  layer_args=self.sub_args,
                                                  reg_args=self.subs_reg_args,
                                                  norm_args=self.subs_norm_args,
-                                                 is_child=True)
+                                                 is_child=True,
+                                                 no_log=True)
 
                     _layer_1 = photon_layers.DNN(self.gauge,
                                                  layer_nm=self.layer_nm + '_cur',
                                                  layer_args=self.sub_args,
                                                  reg_args=self.subs_reg_args,
                                                  norm_args=self.subs_norm_args,
-                                                 is_child=True)
+                                                 is_child=True,
+                                                 no_log=True)
 
                 if self.sub_type == 'cnn':
                     _layer_0 = CNN(
@@ -172,7 +177,8 @@ class EncBars(photon_layers.Layers):
                         layer_args=self.sub_args,
                         reg_args=self.subs_reg_args,
                         norm_args=self.subs_norm_args,
-                        is_child=True)
+                        is_child=True,
+                        no_log=True)
 
                     _layer_1 = CNN(
                         self.gauge,
@@ -180,7 +186,8 @@ class EncBars(photon_layers.Layers):
                         layer_args=self.sub_args,
                         reg_args=self.subs_reg_args,
                         norm_args=self.subs_norm_args,
-                        is_child=True)
+                        is_child=True,
+                        no_log=True)
 
                 self.sub_layers.append(_layer_0)
                 self.sub_layers.append(_layer_1)
@@ -353,6 +360,105 @@ class EncBars(photon_layers.Layers):
         return tf.convert_to_tensor(pe_data, name='z_intra_pe')
 
 class DecBars(photon_layers.Layers):
+
+    def __init__(self, gauge, layer_nm, d_model, sin_pe_on, logs_on, **kwargs):
+        """
+        Layer that produces bars from inputs.
+
+        bars_config:
+
+            n_layers (int 0,1,2):
+                0: Create n_layers based on the depth of the seq dim. One layer for each record in the seq_dim
+                1: One single layer
+                2: Two layers; one for the past records (seq_dim[:-1]) and one layer for the cur records (seq_dim[-1:])
+
+            output_type (string: all, single, split_a, split_b) :
+                all: One-to-one output for each internal layer
+                single: Single output with all internal layers merged
+                split_a: Two outputs; One with all past layers (seq_dim[:-1]) & One with cur layer (seq_dim[-1:])
+                split_b: Two outputs; One with all layers & One with cur layer (seq_dim[-1:])
+
+            kernel_size (string: units, cols):
+                units: the kernel size and output cols of the internal layers will be set to the units in sub_args
+                cols:  the kernel size and output cols of the internal layers will match the num of cols in the last dim of the input
+
+            seq_scale (float) (should set to around .1):
+                if !=0: Adds a learnable scaling var for each internal layer. Inits a constant as float(((idx + 1) * seq_scale) + 1)
+
+                constraints: n_layers != 1
+
+        """
+        super().__init__(gauge, layer_nm, no_subs=True, **kwargs)
+
+        self.d_model = d_model
+        self.sin_pe_on = sin_pe_on
+        self.logs_on = logs_on
+
+    def build(self, input_shp):
+
+        self.input_shp = input_shp
+        self.batch_size = self.input_shp[0]
+        self.seq_depth = self.input_shp[1]
+
+        self.gauge_dtype = self.gauge.tree.data.dtype
+
+        return
+
+    def call(self, inputs, training, **kwargs):
+
+        z_data = inputs
+
+        if self.gauge.is_model_built:
+
+
+
+            z_sin_pe = None
+            z_seq_pe = None
+            z_intra_pe = None
+
+            # z_data = np.repeat(z_data, self.d_model, axis=-1)
+
+            # -- sin pos encoding -- #
+            if self.sin_pe_on:
+                z_sin_pe = self.gen_sin_pe()
+
+                z_data = z_data + z_sin_pe
+
+            z_data = np.roll(z_data, 1, axis=1)
+            z_data[:,0] = 0
+            z_outputs = tf.convert_to_tensor(z_data, dtype=self.gauge_dtype)
+
+            if self.logs_on:
+
+                _log = {'z_inputs': inputs,
+                        'z_sin_pe': z_sin_pe,
+                        'z_seq_pe': z_seq_pe,
+                        'z_intra_pe': z_intra_pe,
+                        'z_data': z_data,
+                        'z_outputs': z_outputs}
+
+                self.save_layer_log(_log)
+
+        return z_data
+
+    def gen_sin_pe(self):
+
+        pos = np.expand_dims(np.arange(0, self.seq_depth), axis=1)
+        pe_data = np.zeros((self.seq_depth, self.d_model))
+
+        div_term = tfm.exp(np.arange(0, self.d_model, 2) * -(tfm.log(10000.0) / self.d_model))
+
+        sin_data = np.sin(pos * div_term)
+        cos_data = np.cos(pos * div_term)
+
+        pe_data[:, 0::2] = sin_data
+        pe_data[:, 1::2] = cos_data
+
+        pe_data = np.repeat(np.expand_dims(pe_data, axis=0), self.batch_size, axis=0)
+
+        return tf.convert_to_tensor(pe_data, name='z_sin_pe_o')
+
+class DecBars_2(photon_layers.Layers):
 
     def __init__(self, gauge, layer_nm, d_model, sin_pe_on, logs_on, **kwargs):
         """
@@ -715,7 +821,7 @@ class Attn(photon_layers.Layers):
 
     def call(self, inputs, training, **kwargs):
 
-        epoch_idx = utils.np_exp(self.gauge.cur_run.epoch_idx)
+        epoch_idx = np_exp(self.gauge.run_model.live.epoch_idx)
 
         if isinstance(inputs, list):
 
@@ -949,7 +1055,7 @@ class EncoderBlock(photon_layers.Layers):
         self.sah = AttnHeads(gauge=self.gauge, layer_nm=self.sah_nm, is_child=True, **self.sah_args)
 
         # -- add first res layer -- #
-        self.res_1 = Res(gauge=self.gauge, layer_nm=self.res_1_nm, res_config=self.res_config, is_child=True)
+        self.res_1 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_1_nm, res_config=self.res_config, is_child=True)
 
         # -- add first ffn layer -- #
         self.ffn_1 = photon_layers.DNN(gauge=self.gauge,
@@ -1046,7 +1152,7 @@ class DecoderBlock(photon_layers.Layers):
     def build(self, input_shp):
 
         # -- add first res layer -- #
-        self.res_1 = Res(gauge=self.gauge, layer_nm=self.res_1_nm, res_config=self.res_config, is_child=True)
+        self.res_1 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_1_nm, res_config=self.res_config, is_child=True)
 
         # -- self attn heads -- #
         self.sah = AttnHeads(gauge=self.gauge, layer_nm=self.sah_nm, **self.sah_args)
@@ -1055,10 +1161,10 @@ class DecoderBlock(photon_layers.Layers):
         self.edah = AttnHeads(gauge=self.gauge, layer_nm=self.edah_nm, **self.edah_args)
 
         # -- add second res layer -- #
-        self.res_2 = Res(gauge=self.gauge, layer_nm=self.res_2_nm, res_config=self.res_config, is_child=True)
+        self.res_2 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_2_nm, res_config=self.res_config, is_child=True)
 
         # -- add second res layer -- #
-        self.res_3 = Res(gauge=self.gauge, layer_nm=self.res_3_nm, res_config=self.res_config, is_child=True)
+        self.res_3 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_3_nm, res_config=self.res_config, is_child=True)
 
         # -- add first ffn layer -- #
         self.ffn_1 = photon_layers.DNN(gauge=self.gauge,

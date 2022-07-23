@@ -225,8 +225,8 @@ class Transformer_2(photon_models.Models):
         self.dec_bars = trans_layers.DecBars(self.gauge,
                                              layer_nm='dec_bars',
                                              d_model=self.d_model,
-                                             sin_pe_on=True,
-                                             logs_on=False,
+                                             sin_pe_on=False,
+                                             logs_on=True,
                                              reg_config=None,
                                              norm_config=None)
 
@@ -279,14 +279,14 @@ class Transformer_2(photon_models.Models):
             tracking = inputs
 
         z_enc_bars = self.enc_bars(inputs)
-        z_dec_bars = self.dec_bars(targets)
+        z_dec_bars = self.dec_bars(inputs)
 
 
-        # z_enc_stack = self.enc_stack(z_enc_bars)
-        #
+        z_enc_stack = self.enc_stack(z_enc_bars)
+
         # z_dec_stack = self.dec_stack([z_dec_bars,z_enc_stack])
 
-        z_pool = self.pool(z_enc_bars)
+        z_pool = self.pool(z_enc_stack)
         z_out = self.dnn_out(z_pool)
 
         # z_out = self.trans_out(z_enc_bars)

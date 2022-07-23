@@ -6,21 +6,27 @@ src_chain = run_chain.src
 
 run_model = run_chain.models[0]
 
+tree = src_branch.trees[0]
+
 gauge = src_chain.models[0]
 
 model = gauge.src
 
 
-layer_logs = run.branches[0].chains[0].src.models[0].logs.layers['main']
+layer_logs = run.branches[0].chains[0].src.models[0].logs.layers['main'][0][1]
 
-# # --- log calls --- #
-# if self.gauge.is_model_built and self.log_calls and not self.gauge.run_model.live.is_val:
-#
-#     if len(self.self.call_logs['main']) <= epoch_idx:
-#         self.self.call_logs['main'].append([])
-#
-#     _log = {'layers': log_data, 'z_outputs': z_outputs}
-#
-#     self.rd_logs[epoch_idx].insert(batch_idx, _log)
-#
+batch_data_logs = trans_branch.chains[0].logs.batch_data['main']
 
+for x in layer_logs:
+    print(x['layer_name'], x['in_shape'], x['out_shape'])
+
+
+layer_logs[0]['input'].shape
+
+
+batch_data_logs[0][0]['tracking'][0]
+
+
+gauge.layers['dec_bars'].logs[0][0].keys()
+
+gauge.layers['dec_bars'].logs[0][0]['z_data']
