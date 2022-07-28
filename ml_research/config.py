@@ -963,6 +963,8 @@ train_days = 100
 test_days = 50
 val_days = 100
 
+outputs_on = True
+
 samples_pd = 2
 seed = None
 
@@ -1025,6 +1027,7 @@ tree_config = {'name': 'Base',
                'val_on': val_on,
                'test_on': test_on,
                'masking': masking,
+               'outputs_on': outputs_on,
                'seed': seed}
 
 # endregion:
