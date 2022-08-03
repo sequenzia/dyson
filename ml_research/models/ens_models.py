@@ -9,7 +9,7 @@ class Model_A(photon_models.Models):
 
         super().__init__(**kwargs)
 
-    def build_model(self):
+    def build_model(self, **kwargs):
 
         act_fn = activations.relu
 
@@ -67,7 +67,7 @@ class Model_A(photon_models.Models):
                                          reg_args=None,
                                          norm_args=None)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         z_cnn_1 = self.cnn_1(inputs)
         z_pool = self.pool(z_cnn_1)
@@ -87,7 +87,7 @@ class Model_B(photon_models.Models):
 
         super().__init__(**kwargs)
 
-    def build_model(self):
+    def build_model(self, **kwargs):
 
         flat_args = {'weights_on': True,
                      'bias_on': True}
@@ -151,7 +151,7 @@ class Model_B(photon_models.Models):
                                          layer_nm='dnn_out',
                                          layer_args=dnn_out_args)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         run_data = self.call_run_data(inputs)
         z_dnn_1 = self.dnn_1(run_data)
@@ -171,7 +171,7 @@ class Model_C(photon_models.Models):
 
         super().__init__(**kwargs)
 
-    def build_model(self):
+    def build_model(self, **kwargs):
 
         flat_args = {'weights_on': True,
                      'bias_on': True}
@@ -226,7 +226,7 @@ class Model_C(photon_models.Models):
                                          layer_nm='dnn_out',
                                          layer_args=dnn_out_args)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         run_data = self.call_run_data(inputs)
 

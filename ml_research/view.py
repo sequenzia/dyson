@@ -10,7 +10,17 @@ tree = src_branch.trees[0]
 
 gauge = src_chain.models[0]
 
+
+gauge.logs.theta[0][0]['model_pre'][0]['avg']
+gauge.logs.theta[0][0]['grads'][0]['avg']
+gauge.logs.theta[0][0]['model_post'][0]['avg']
+
+gauge.logs.theta[0][0]['opt'][1]
+
+
 model = gauge.src
+
+model.log_theta
 
 
 layer_logs = run.branches[0].chains[0].src.models[0].logs.layers['main'][0][1]

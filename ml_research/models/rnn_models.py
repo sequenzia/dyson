@@ -9,7 +9,7 @@ class LSTM_Pool(photon_models.Models):
 
         super().__init__(**kwargs)
 
-    def build_model(self):
+    def build_model(self, **kwargs):
 
         act_fn = activations.relu
 
@@ -68,7 +68,7 @@ class LSTM_Pool(photon_models.Models):
                                          reg_args=None,
                                          norm_args=None)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         z_rnn_1 = self.rnn_1(inputs)
         z_pool = self.pool(z_rnn_1)
@@ -88,7 +88,7 @@ class LSTM_NoPool(photon_models.Models):
 
         super().__init__(**kwargs)
 
-    def build_model(self):
+    def build_model(self, **kwargs):
 
         act_fn = activations.relu
 
@@ -166,7 +166,7 @@ class LSTM_NoPool(photon_models.Models):
                                          reg_args=None,
                                          norm_args=None)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         z_rnn_1 = self.rnn_1(inputs)
         z_rnn_out = self.rnn_out(z_rnn_1)
@@ -186,7 +186,7 @@ class LSTM_Deep(photon_models.Models):
 
         super().__init__(**kwargs)
 
-    def build_model(self):
+    def build_model(self, **kwargs):
 
         act_fn = activations.relu
 
@@ -306,7 +306,7 @@ class LSTM_Deep(photon_models.Models):
                                          reg_args=None,
                                          norm_args=None)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         z_rnn_1 = self.rnn_1(inputs)
         z_rnn_2 = self.rnn_2(z_rnn_1)

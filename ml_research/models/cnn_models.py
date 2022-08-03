@@ -3,7 +3,7 @@ from photon import models as photon_models, layers as photon_layers
 from tensorflow.keras import layers as tf_layers
 from tensorflow.keras import activations, initializers, regularizers, constraints
 
-class Base_CNN(photon_models.Models):
+class CNN_Base(photon_models.Models):
 
     def __init__(self, **kwargs):
 
@@ -86,7 +86,7 @@ class Base_CNN(photon_models.Models):
                                          reg_args=None,
                                          norm_args=None)
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
 
         z_cnn_1 = self.cnn_1(inputs)
         z_cnn_2 = self.cnn_2(z_cnn_1)
