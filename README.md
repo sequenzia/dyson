@@ -14,8 +14,13 @@ The config file loads [datasets](/ml_research/data) that are in Apache Parquet f
 
 The config files also loads [models](/ml_research/models) & [layers](/ml_research/layers) that are subclassed from Photon ML which is also a subclass of TensorFlow.
 
+## Run on Google Colab
 
-### Sample Datasets
+https://github.com/sequenzia/dyson/blob/master/run_photon.ipynb
+
+*** make sure the Colab Notebook has a GPU runtime type
+
+## Sample Datasets
 Sample Market Data: (Apache Arrow Parquet File)
 
 - SPY ETF market data in 1M resolution (2 years: 2016-2017)
@@ -23,3 +28,4 @@ Sample Market Data: (Apache Arrow Parquet File)
 - Includes predefined label groups (1,2,3,4,5,6 & 7 days in the future)
 - Discrete price movements with rate of change; used for regression inferences 
 - 5 predefined classes for each label group; for used for classification inferences
+
