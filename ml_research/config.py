@@ -598,7 +598,7 @@ zsc_cols = {
                     'x_group': 'zsc'}}
 
 x_cols = pr_cols
-    # {**pr_cols, **vol_cols, **atr_cols, **roc_cols, **zsc_cols}
+# {**pr_cols, **vol_cols, **atr_cols, **roc_cols, **zsc_cols}
 
 c_cols = {
     'tf_yq': {
@@ -1123,28 +1123,28 @@ trans_config = {'name': 'trans',
 cnn_n_chains = 1
 
 cnn_model_config = [{'model': cnn_models.CNN_Base,
-                       'n_models': 1,
-                       'n_outputs': 5,
-                       'args': {'d_model': 512,
-                                'reg_args': None,
-                                'norm_args': None,
-                                'reg_vals': [0],
-                                'seed': seed,
-                                'is_prob': False,
-                                'show_calls': False,
-                                'log_config': model_log_config}}]
+                     'n_models': 1,
+                     'n_outputs': 5,
+                     'args': {'d_model': 512,
+                              'reg_args': None,
+                              'norm_args': None,
+                              'reg_vals': [0],
+                              'seed': seed,
+                              'is_prob': False,
+                              'show_calls': False,
+                              'log_config': model_log_config}}]
 
-cnn_config = {'name': 'trans',
-                'n_epochs': n_epochs,
-                'n_chains': cnn_n_chains,
-                'model_config': cnn_model_config,
-                'data_config': data_config,
-                'build_config': build_config,
-                'opt_config': opt_config,
-                'loss_config': loss_config,
-                'metrics_config': metrics_config,
-                'run_config': run_config,
-                'save_config': save_config}
+cnn_config = {'name': 'CNN',
+              'n_epochs': n_epochs,
+              'n_chains': cnn_n_chains,
+              'model_config': cnn_model_config,
+              'data_config': data_config,
+              'build_config': build_config,
+              'opt_config': opt_config,
+              'loss_config': loss_config,
+              'metrics_config': metrics_config,
+              'run_config': run_config,
+              'save_config': save_config}
 
 # endregion:
 
@@ -1153,28 +1153,28 @@ cnn_config = {'name': 'trans',
 rnn_n_chains = 1
 
 rnn_model_config = [{'model': rnn_models.LSTM_Pool,
-                       'n_models': 1,
-                       'n_outputs': 5,
-                       'args': {'d_model': 512,
-                                'reg_args': None,
-                                'norm_args': None,
-                                'reg_vals': [0],
-                                'seed': seed,
-                                'is_prob': False,
-                                'show_calls': False,
-                                'log_config': model_log_config}}]
+                     'n_models': 1,
+                     'n_outputs': 5,
+                     'args': {'d_model': 512,
+                              'reg_args': None,
+                              'norm_args': None,
+                              'reg_vals': [0],
+                              'seed': seed,
+                              'is_prob': False,
+                              'show_calls': False,
+                              'log_config': model_log_config}}]
 
-rnn_config = {'name': 'trans',
-                'n_epochs': n_epochs,
-                'n_chains': rnn_n_chains,
-                'model_config': rnn_model_config,
-                'data_config': data_config,
-                'build_config': build_config,
-                'opt_config': opt_config,
-                'loss_config': loss_config,
-                'metrics_config': metrics_config,
-                'run_config': run_config,
-                'save_config': save_config}
+rnn_config = {'name': 'RNN',
+              'n_epochs': n_epochs,
+              'n_chains': rnn_n_chains,
+              'model_config': rnn_model_config,
+              'data_config': data_config,
+              'build_config': build_config,
+              'opt_config': opt_config,
+              'loss_config': loss_config,
+              'metrics_config': metrics_config,
+              'run_config': run_config,
+              'save_config': save_config}
 
 # endregion:
 
@@ -1308,7 +1308,7 @@ ens_run_config = [{'run_type': 'fit',
                    'async_on': False,
                    'msgs_on': True}]
 
-ens_config = {'name': 'ens',
+ens_config = {'name': 'Ens',
               'n_epochs': n_epochs,
               'n_chains': ens_n_chains,
               'model_config': ens_model_config,
