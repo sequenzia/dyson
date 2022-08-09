@@ -2,7 +2,7 @@ import sys, os
 import tensorflow as tf
 import numpy as np
 
-run_local = False
+run_local = True
 local_path = '/var/lib/alpha/photon/pkg/src/'
 cuda_devices = [0,1,2]
 
@@ -24,5 +24,5 @@ cnn_branch = photon.Branches(trees=[tree], **config.cnn_config)
 rnn_branch = photon.Branches(trees=[tree], **config.rnn_config)
 trans_branch = photon.Branches(trees=[tree], **config.trans_config)
 
-run = net.gamma.run_network(branches=[ens_branch])
+run = net.gamma.run_network(branches=[cnn_branch])
 

@@ -1123,7 +1123,7 @@ trans_config = {'name': 'trans',
 cnn_n_chains = 1
 
 cnn_model_config = [{'model': cnn_models.CNN_Base,
-                     'n_models': 1,
+                     'n_models': 10,
                      'n_outputs': 5,
                      'args': {'d_model': 512,
                               'reg_args': None,
