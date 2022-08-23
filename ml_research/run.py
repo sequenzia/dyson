@@ -23,6 +23,8 @@ ens_branch = photon.Branches(trees=[tree], **config.ens_config)
 cnn_branch = photon.Branches(trees=[tree], **config.cnn_config)
 rnn_branch = photon.Branches(trees=[tree], **config.rnn_config)
 trans_branch = photon.Branches(trees=[tree], **config.trans_config)
+prob_branch = photon.Branches(trees=[tree], **config.prob_config)
 
-run = net.gamma.run_network(branches=[cnn_branch])
+run = net.gamma.run_network(branches=[prob_branch])
+
 

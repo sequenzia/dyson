@@ -1,5 +1,5 @@
 from photon import metrics, losses, optimizers, utils, options
-from models import ens_models, cnn_models, rnn_models, trans_models
+from models import ens_models, cnn_models, rnn_models, trans_models, prob_models
 
 losses = losses.Losses()
 metrics = metrics.Metrics()
@@ -1032,17 +1032,18 @@ tree_config = {'name': 'Base',
 
 # endregion:
 
-# region: ........... Branch Configs ........... #
+# region: ------------------------ Branch Configs ------------------------  #
 
-model_log_config = {'log_calls': {'main': False, 'val': False},
-                    'log_layers': {'main': True, 'val': False},
-                    'log_run_data': {'main': False, 'val': False},
-                    'log_theta': True}
+log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
+              'models': {'log_calls': {'main': False, 'val': False},
+                         'log_layers': {'main': True, 'val': False},
+                         'log_run_data': {'main': False, 'val': False},
+                         'log_theta': True}}
 
 data_config = [{'input_src': 'batch',
                 'targets': {'is_seq': False,
                             'split_on': 5},
-                'log_config': {'log_batch_data': {'main': True, 'val': False}}}]
+                'log_config': log_config['data']}]
 
 build_config = [{'strat_type': None,
                  'dist_type': None,
@@ -1102,7 +1103,7 @@ trans_model_config = [{'model': trans_models.Transformer_2,
                                 'seed': seed,
                                 'is_prob': False,
                                 'show_calls': False,
-                                'log_config': model_log_config}}]
+                                'log_config': log_config['models']}}]
 
 trans_config = {'name': 'trans',
                 'n_epochs': n_epochs,
@@ -1118,7 +1119,7 @@ trans_config = {'name': 'trans',
 
 # endregion:
 
-# region: ........ CNNS ........ #
+# region: ........ CNN Models ........ #
 
 cnn_n_chains = 1
 
@@ -1132,7 +1133,7 @@ cnn_model_config = [{'model': cnn_models.CNN_Base,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}}]
+                              'log_config': log_config['models']}}]
 
 cnn_config = {'name': 'CNN',
               'n_epochs': n_epochs,
@@ -1148,7 +1149,7 @@ cnn_config = {'name': 'CNN',
 
 # endregion:
 
-# region: ........ RNNs ........ #
+# region: ........ RNN Models ........ #
 
 rnn_n_chains = 1
 
@@ -1162,7 +1163,7 @@ rnn_model_config = [{'model': rnn_models.LSTM_Pool,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}}]
+                              'log_config': log_config['models']}}]
 
 rnn_config = {'name': 'RNN',
               'n_epochs': n_epochs,
@@ -1178,7 +1179,7 @@ rnn_config = {'name': 'RNN',
 
 # endregion:
 
-# region: .......... Ensemble .......... #
+# region: .......... Ensemble Learning .......... #
 
 ens_n_chains = 5
 
@@ -1192,7 +1193,7 @@ ens_model_config = [{'model': ens_models.Model_A,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}},
+                              'log_config': log_config['models']}},
 
                     {'model': ens_models.Model_B,
                      'n_models': 10,
@@ -1204,7 +1205,7 @@ ens_model_config = [{'model': ens_models.Model_A,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}},
+                              'log_config': log_config['models']}},
 
                     {'model': ens_models.Model_B,
                      'n_models': 10,
@@ -1216,7 +1217,7 @@ ens_model_config = [{'model': ens_models.Model_A,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}},
+                              'log_config': log_config['models']}},
 
                     {'model': ens_models.Model_B,
                      'n_models': 10,
@@ -1228,7 +1229,7 @@ ens_model_config = [{'model': ens_models.Model_A,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}},
+                              'log_config': log_config['models']}},
 
                     {'model': ens_models.Model_C,
                      'n_models': 1,
@@ -1240,7 +1241,7 @@ ens_model_config = [{'model': ens_models.Model_A,
                               'seed': seed,
                               'is_prob': False,
                               'show_calls': False,
-                              'log_config': model_log_config}}]
+                              'log_config': log_config['models']}}]
 
 ens_opt_config = [{'fn': optimizers.AdamDynamic,
                    'args': {'lr_st': 0.025,
@@ -1319,5 +1320,35 @@ ens_config = {'name': 'Ens',
               'metrics_config':ens_metrics_config,
               'run_config': ens_run_config,
               'save_config': ens_save_config}
+
+# endregion:
+
+# region: ........ Probabilistic Models ........ #
+
+prob_n_chains = 1
+
+prob_model_config = [{'model': prob_models.Prob_1,
+                       'n_models': 1,
+                       'n_outputs': 5,
+                       'args': {'d_model': 512,
+                                'reg_args': None,
+                                'norm_args': None,
+                                'reg_vals': [0],
+                                'seed': seed,
+                                'is_prob': False,
+                                'show_calls': False,
+                                'log_config': log_config['models']}}]
+
+prob_config = {'name': 'prob',
+                'n_epochs': n_epochs,
+                'n_chains': prob_n_chains,
+                'model_config': prob_model_config,
+                'data_config': data_config,
+                'build_config': build_config,
+                'opt_config': opt_config,
+                'loss_config': loss_config,
+                'metrics_config': metrics_config,
+                'run_config': run_config,
+                'save_config': save_config}
 
 # endregion:

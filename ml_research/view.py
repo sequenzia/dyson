@@ -10,6 +10,11 @@ tree = src_branch.trees[0]
 
 gauge = src_chain.models[0]
 
+
+gauge.run_model.live.data_type
+
+gauge.tree.data.store['train']['config']['n_samples']
+
 run_chain.specs['run_spec']
 
 gauge.logs.theta[0][0]['model_pre'][0]['avg']
