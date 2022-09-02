@@ -13,7 +13,7 @@ class CNN_Base(photon_models.Models):
 
         act_fn = activations.relu
 
-        k_reg = None
+        k_reg = regularizers.L1(l1=0.01)
         b_reg = None
         a_reg = None
 
@@ -30,7 +30,7 @@ class CNN_Base(photon_models.Models):
                     'trainable': True}
 
         dnn_out_args = {'units': 5,
-                        'activation': None,
+                        'activation': activations.softmax,
                         'use_bias': True,
                         'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
                         'bias_initializer': initializers.Zeros(),

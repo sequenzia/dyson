@@ -1,8 +1,11 @@
-from photon import metrics, losses, optimizers, utils, options
+from photon import metrics as photon_metrics, losses, optimizers, utils, options
 from models import ens_models, cnn_models, rnn_models, trans_models, prob_models
+import metrics
+
+metrics = metrics.Metrics()
 
 losses = losses.Losses()
-metrics = metrics.Metrics()
+photon_metrics = photon_metrics.Metrics()
 
 options = options.get_options()
 
@@ -1058,10 +1061,14 @@ opt_config = [{'fn': optimizers.AdamDynamic,
                         'static_epochs': [2,2]}}]
 
 loss_config = [{'fn': losses.categorical_crossentropy,
-                'args': {'from_logits': True,
+                'args': {'from_logits': False,
                          'reduction': 'NONE'}}]
 
-metrics_config = [{'fn': metrics.CatAcc,
+metrics_config = [{'fn': metrics.AUC,
+                   'args': {"from_logits": False}},
+                  {'fn': metrics.Precision,
+                   'args': {}},
+                  {'fn': metrics.Recall,
                    'args': {}}]
 
 run_config = [{'run_type': 'fit',
@@ -1124,7 +1131,7 @@ trans_config = {'name': 'trans',
 cnn_n_chains = 1
 
 cnn_model_config = [{'model': cnn_models.CNN_Base,
-                     'n_models': 10,
+                     'n_models': 1,
                      'n_outputs': 5,
                      'args': {'d_model': 512,
                               'reg_args': None,
@@ -1283,7 +1290,7 @@ ens_loss_config = [{'fn': losses.categorical_crossentropy,
                     'args': {'from_logits': True,
                              'reduction': 'NONE'}}]
 
-ens_metrics_config = [{'fn': metrics.CatAcc,
+ens_metrics_config = [{'fn': photon_metrics.CatAcc,
                        'args': {}}]
 
 ens_save_config = [{'features': None,
