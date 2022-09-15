@@ -46,6 +46,7 @@ layer_logs = gauge.logs.layers['main'][0][0]
 layer_logs[0]
 
 # --- Run Data Logs -- #
+""" """
 
 # ---  Theta Logs --- #
 """
@@ -70,14 +71,11 @@ for p in pre_layers:
 gauge.logs.theta[0][0]['model_pre'][0]['value'][0]
 gauge.logs.theta[0][0]['model_pre'][3]['value'][0]
 
-
 pre = gauge.logs.theta[0][0]['model_pre'][0]['value'][0]
-
 
 grads = gauge.logs.theta[0][0]['grads'][0]['value'][0]
 post = gauge.logs.theta[0][0]['model_post'][0]['value'][0]
 lr = gauge.logs.theta[0][0]['opt'][0]['value'][0]
-
 
 gauge.layers['dnn_1'].trainable_variables[0]
 

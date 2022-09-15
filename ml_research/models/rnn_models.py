@@ -34,7 +34,7 @@ class LSTM_Pool(photon_models.Models):
                       'return_state': False}
 
         dnn_out_args = {'units': 5,
-                        'activation': None,
+                        'activation': activations.softmax,
                         'use_bias': True,
                         'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
                         'bias_initializer': initializers.Zeros(),
