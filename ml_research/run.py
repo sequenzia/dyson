@@ -1,5 +1,4 @@
 import sys, os
-import tensorflow as tf
 import numpy as np
 
 run_local = True
@@ -7,7 +6,7 @@ local_path = '/var/lib/alpha/photon/pkg/src/'
 cuda_devices = [0,1,2]
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(e) for e in cuda_devices)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if run_local:
     sys.path.insert(0,local_path)
@@ -25,8 +24,5 @@ rnn_branch = photon.Branches(trees=[tree], **config.rnn_config)
 trans_branch = photon.Branches(trees=[tree], **config.trans_config)
 prob_branch = photon.Branches(trees=[tree], **config.prob_config)
 
-run = net.gamma.run_network(branches=[rnn_branch])
-
-
-
+run = net.gamma.run_network(branches=[cnn_branch])
 
