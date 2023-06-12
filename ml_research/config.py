@@ -1062,7 +1062,7 @@ opt_config = [{'fn': optimizers.AdamDynamic,
 
 loss_config = [{'fn': losses.categorical_crossentropy,
                 'args': {'from_logits': False,
-                         'reduction': 'NONE'}}]
+                         'reduction': 'none'}}]
 
 metrics_config = [{'fn': metrics.AUC,
                    'args': {"from_logits": False}},
@@ -1288,7 +1288,7 @@ ens_build_config = [{'strat_type': None,
 
 ens_loss_config = [{'fn': losses.categorical_crossentropy,
                     'args': {'from_logits': True,
-                             'reduction': 'NONE'}}]
+                             'reduction': 'none'}}]
 
 ens_metrics_config = [{'fn': photon_metrics.CatAcc,
                        'args': {}}]
