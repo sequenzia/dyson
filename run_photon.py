@@ -1,23 +1,16 @@
 import sys, os
-import tensorflow as tf
-import numpy as np
-
-run_local = True
-local_path = '/var/lib/alpha/omega/photon/src'
-data_dir = '/var/lib/alpha/omega/dyson/ml_research/data'
-cuda_devices = [0,]
-
-os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(e) for e in cuda_devices)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
+import numpy as np, tensorflow as tf
+import config
 from photon import Photon
 
-import config
+RUN_LOCAL = True
+LOCAL_PATH = '/var/lib/alpha/omega/photon/src'
+DATA_DIR = '/var/lib/alpha/omega/dyson/ml_research/data'
 
-config.network_config['data_dir'] = data_dir
+config.network_config['data_dir'] = DATA_DIR
 config.network_config['data_fn'] = 'SPY_1T_2016_2017'
 
-photon = Photon(run_local=run_local)
+photon = Photon(run_local=RUN_LOCAL)
 
 net = photon.Networks(photon=photon, **config.network_config)
 tree = photon.Trees(network=net, **config.tree_config)

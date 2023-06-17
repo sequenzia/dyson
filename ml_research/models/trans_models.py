@@ -18,10 +18,12 @@ class Transformer_1(photon_models.Models):
         b_reg = None
         a_reg = None
 
+        k_init = initializers.GlorotUniform(seed=self.seed)
+
         rnn_args = {'units': self.d_model,
                       'activation': activations.tanh,
                       'recurrent_activation': 'sigmoid',
-                      'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
+                      'kernel_initializer': k_init,
                       'recurrent_initializer': initializers.Orthogonal(seed=self.seed),
                       'use_bias': True,
                       'bias_initializer': initializers.Zeros(),
@@ -37,7 +39,7 @@ class Transformer_1(photon_models.Models):
         dnn_out_args = {'units': 5,
                         'activation': None,
                         'use_bias': True,
-                        'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
+                        'kernel_initializer': k_init,
                         'bias_initializer': initializers.Zeros(),
                         'kernel_regularizer': k_reg,
                         'bias_regularizer': b_reg,
@@ -108,13 +110,15 @@ class Transformer_2(photon_models.Models):
 
         # ----- configs ----- #
 
+        k_init = initializers.GlorotUniform(self.seed)
+
         bars_cnn_args = {'filters': self.d_model,
                          'kernel_size': 3,
                          'strides': 1,
                          'padding': 'causal',
                          'dilation_rate': 1,
                          'activation': act_fn,
-                         'kernel_initializer': initializers.GlorotUniform(self.seed),
+                         'kernel_initializer': k_init,
                          'use_bias': True,
                          'bias_initializer': initializers.Zeros(),
                          'kernel_regularizer':  k_reg,
@@ -139,7 +143,7 @@ class Transformer_2(photon_models.Models):
         out_args = {'units': 5,
                     'activation': None,
                     'use_bias': True,
-                    'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
+                    'kernel_initializer': k_init,
                     'bias_initializer': initializers.Zeros(),
                     'kernel_regularizer': k_reg,
                     'bias_regularizer': b_reg,
@@ -151,7 +155,7 @@ class Transformer_2(photon_models.Models):
         res_dnn_args = {'units': 5,
                         'activation': None,
                         'use_bias': True,
-                        'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
+                        'kernel_initializer': k_init,
                         'bias_initializer': initializers.Zeros(),
                         'kernel_regularizer': k_reg,
                         'bias_regularizer': b_reg,
@@ -175,7 +179,7 @@ class Transformer_2(photon_models.Models):
                           'res_norm': 0}
 
         attn_args = {'attn_units': self.d_model,
-                     'k_init': initializers.GlorotUniform(self.seed),
+                     'k_init': k_init,
                      'use_bias': True,
                      'b_init': initializers.Zeros(),
                      'act_fn': None,
@@ -205,7 +209,7 @@ class Transformer_2(photon_models.Models):
         dnn_out_args = {'units': 5,
                         'activation': None,
                         'use_bias': True,
-                        'kernel_initializer': initializers.GlorotUniform(seed=self.seed),
+                        'kernel_initializer': k_init,
                         'bias_initializer': initializers.Zeros(),
                         'kernel_regularizer': k_reg,
                         'bias_regularizer': b_reg,
