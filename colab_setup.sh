@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TEMP_DIR=/home/zadmin/.temp
-SRC_DIR=/home/zadmin/src
+TEMP_DIR=/content/.temp
+SRC_DIR=/content/src
 
 if [ -d $TEMP_DIR ]; then
     chmod 777 -R $TEMP_DIR
