@@ -1,4 +1,4 @@
-import layers as user_layers
+from dyson import layers as user_layers
 from photon import models as photon_models, layers as photon_layers
 from tensorflow.keras import layers as tf_layers
 from tensorflow.keras import activations, initializers, regularizers, constraints
@@ -48,7 +48,7 @@ class CNN_Base(photon_models.Models):
                                        kernel_size=5,
                                        reg_args=self.reg_args,
                                        norm_args=self.norm_args)
-        
+
         self.cnn_2 = photon_layers.CNN(self.gauge,
                                        layer_nm='cnn_2',
                                        layer_args=cnn_args,
@@ -56,7 +56,7 @@ class CNN_Base(photon_models.Models):
                                        kernel_size=5,
                                        reg_args=self.reg_args,
                                        norm_args=self.norm_args)
-        
+
         self.cnn_3 = photon_layers.CNN(self.gauge,
                                        layer_nm='cnn_3',
                                        layer_args=cnn_args,

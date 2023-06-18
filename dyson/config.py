@@ -1,6 +1,6 @@
 from photon import metrics as photon_metrics, losses, optimizers, utils, options
-from models import ens_models, cnn_models, rnn_models, trans_models, prob_models
-import metrics
+from dyson.models import ens_models, cnn_models, rnn_models, trans_models, prob_models
+from dyson import metrics
 
 metrics = metrics.Metrics()
 

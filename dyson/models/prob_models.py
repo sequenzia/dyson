@@ -1,4 +1,4 @@
-import layers as user_layers
+from dyson import layers as user_layers
 from photon import models as photon_models, layers as photon_layers, kernels as photon_kernels
 
 from tensorflow.keras import layers as tf_layers
