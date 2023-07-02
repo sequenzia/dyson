@@ -11,7 +11,7 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 1
+n_epochs = 100
 
 # region: ............ Network ........... #
 
@@ -969,7 +969,7 @@ val_days = 100
 outputs_on = True
 
 samples_pd = 2
-seed = None
+seed = 1
 
 shuffle = {'shuffle_on': False,
            'seed': seed}
@@ -994,7 +994,7 @@ masking = {'blocks': {'train': {'mask': utils.config_block_mask(),
 
 seq_days = 1
 
-len = 390
+seq_len = 390
 agg = 5
 
 val_on = True
@@ -1025,7 +1025,7 @@ tree_config = {'name': 'Base',
                'test_days': test_days,
                'val_days': val_days,
                'seq_days': seq_days,
-               'seq_len': len,
+               'seq_len': seq_len,
                'seq_agg': agg,
                'val_on': val_on,
                'test_on': test_on,
@@ -1041,7 +1041,7 @@ log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
               'models': {'log_calls': {'main': False, 'val': False},
                          'log_layers': {'main': True, 'val': False},
                          'log_run_data': {'main': False, 'val': False},
-                         'log_theta': True}}
+                         'log_theta': False}}
 
 data_config = [{'input_src': 'batch',
                 'targets': {'is_seq': False,
@@ -1055,7 +1055,7 @@ build_config = [{'strat_type': None,
                  'save_cp': True}]
 
 opt_config = [{'fn': optimizers.AdamDynamic,
-               'args': {'lr_st': 0.01,
+               'args': {'lr_st': 0.001,
                         'lr_min': 1e-7,
                         'decay_rate': 1.25,
                         'static_epochs': [2,2]}}]
