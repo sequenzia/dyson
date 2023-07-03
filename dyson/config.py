@@ -1,6 +1,7 @@
 from photon import metrics as photon_metrics, losses, optimizers, utils, options
 from dyson.models import ens_models, cnn_models, rnn_models, trans_models, prob_models
 from dyson import metrics
+import tensorflow as tf
 
 metrics = metrics.Metrics()
 
@@ -1055,7 +1056,7 @@ build_config = [{'strat_type': None,
                  'save_cp': True}]
 
 opt_config = [{'fn': optimizers.AdamDynamic,
-               'args': {'lr_st': 0.001,
+               'args': {'lr_st': 0.0001,
                         'lr_min': 1e-7,
                         'decay_rate': 1.25,
                         'static_epochs': [2,2]}}]

@@ -258,7 +258,6 @@ class Transformer_2(photon_models.Models):
                                                reg_config=None,
                                                norm_config=None)
 
-
         self.pool = photon_layers.Pool(self.gauge,
                                        layer_nm='pool',
                                        pool_type='avg',

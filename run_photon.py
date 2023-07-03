@@ -21,3 +21,7 @@ trans_branch = photon.Branches(trees=[tree], **config.trans_config)
 
 run = net.gamma.run_network(branches=[trans_branch])
 
+branch = trans_branch
+chain = branch.chains[0]
+model = chain.models[0]
+
