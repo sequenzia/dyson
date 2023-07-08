@@ -1,7 +1,6 @@
 from photon import metrics as photon_metrics, losses, optimizers, utils, options
-from dyson.models import ens_models, cnn_models, rnn_models, trans_models, prob_models
+from dyson.models import dnn_models, cnn_models, rnn_models, ens_models, prob_models, trans_models
 from dyson import metrics
-import tensorflow as tf
 
 metrics = metrics.Metrics()
 
@@ -12,9 +11,9 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 100
+n_epochs = 500
 
-# region: ............ Network ........... #
+# region: ************** Network ************** #
 
 data_dir = 'data'
 data_fn = 'SPY_1T_2016_2017'
@@ -33,22 +32,22 @@ msgs_on = {
 # ------ Cols ------ #
 
 f_cols = [
-    ['','0'],
-    ['F1_hold_mins','1T'],
-    ['F2_hold_mins','2T'],
-    ['F3_hold_mins','3T'],
-    ['F4_hold_mins','4T'],
-    ['F5_hold_mins','5T'],
-    ['F6_hold_mins','10T'],
-    ['F7_hold_mins','15T'],
-    ['F8_hold_mins','30T'],
-    ['F9_hold_mins','1H'],
-    ['F10_hold_mins','2H'],
-    ['F11_hold_mins','3H'],
-    ['F12_hold_mins','1D'],
-    ['F13_hold_mins','3D'],
-    ['F14_hold_mins','5D'],
-    ['F15_hold_mins','7D']]
+    ['', '0'],
+    ['F1_hold_mins', '1T'],
+    ['F2_hold_mins', '2T'],
+    ['F3_hold_mins', '3T'],
+    ['F4_hold_mins', '4T'],
+    ['F5_hold_mins', '5T'],
+    ['F6_hold_mins', '10T'],
+    ['F7_hold_mins', '15T'],
+    ['F8_hold_mins', '30T'],
+    ['F9_hold_mins', '1H'],
+    ['F10_hold_mins', '2H'],
+    ['F11_hold_mins', '3H'],
+    ['F12_hold_mins', '1D'],
+    ['F13_hold_mins', '3D'],
+    ['F14_hold_mins', '5D'],
+    ['F15_hold_mins', '7D']]
 
 x_pcts = {
     'X_TP_VWAP': {
@@ -950,8 +949,8 @@ network_config = {'photon_id': photon_id,
                   'data_dir': data_dir,
                   'data_fn': data_fn,
                   'data_res': data_res,
-                  'data_cols':data_cols,
-                  'x_groups_on':x_groups_on,
+                  'data_cols': data_cols,
+                  'x_groups_on': x_groups_on,
                   'dirs_on': dirs_on,
                   'diag_on': diag_on,
                   'msgs_on': msgs_on,
@@ -959,7 +958,7 @@ network_config = {'photon_id': photon_id,
 
 # endregion:
 
-# region: ............ Tree ............. #
+# region: *************** Tree *************** #
 
 batch_size = 100
 
@@ -998,8 +997,12 @@ seq_days = 1
 seq_len = 390
 agg = 5
 
-val_on = True
+val_on = False
 test_on = False
+metrics_on = False
+
+load_cp = False
+save_cp = False
 
 offset = {'type': None,
           'x_on': False,
@@ -1036,7 +1039,7 @@ tree_config = {'name': 'Base',
 
 # endregion:
 
-# region: ------------------------ Branch Configs ------------------------  #
+# region: ************** Branch **************  #
 
 log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
               'models': {'log_calls': {'main': False, 'val': False},
@@ -1052,14 +1055,14 @@ data_config = [{'input_src': 'batch',
 build_config = [{'strat_type': None,
                  'dist_type': None,
                  'pre_build': True,
-                 'load_cp': True,
-                 'save_cp': True}]
+                 'load_cp': load_cp,
+                 'save_cp': save_cp}]
 
 opt_config = [{'fn': optimizers.AdamDynamic,
-               'args': {'lr_st': 0.0001,
-                        'lr_min': 1e-7,
+               'args': {'lr_st': 0.01,
+                        'lr_min': 1e-8,
                         'decay_rate': 1.25,
-                        'static_epochs': [2,2]}}]
+                        'static_epochs': [2, 2]}}]
 
 loss_config = [{'fn': losses.categorical_crossentropy,
                 'args': {'from_logits': False,
@@ -1074,12 +1077,11 @@ metrics_config = [{'fn': metrics.AUC,
 
 run_config = [{'run_type': 'fit',
                'data_type': 'train',
-               'val_on': True,
-               'metrics_on': True,
+               'val_on': val_on,
+               'metrics_on': metrics_on,
                'pre_build': True,
-               'load_cp': True,
-               'save_cp': True,
-               'async_on': False,
+               'load_cp': load_cp,
+               'save_cp': save_cp,
                'msgs_on': True}]
 
 save_config = [{'features': None,
@@ -1097,33 +1099,33 @@ save_config = [{'features': None,
 
 # endregion:
 
-# region: ........ Transformers ........ #
+# region: ........ DNN Models ........ #
 
-trans_n_chains = 1
+dnn_n_chains = 1
 
-trans_model_config = [{'model': trans_models.Transformer_2,
-                       'n_models': 1,
-                       'n_outputs': 5,
-                       'args': {'d_model': 512,
-                                'reg_args': None,
-                                'norm_args': None,
-                                'reg_vals': [0],
-                                'seed': seed,
-                                'is_prob': False,
-                                'show_calls': False,
-                                'log_config': log_config['models']}}]
+dnn_model_config = [{'model': dnn_models.DNN_Base,
+                     'n_models': 1,
+                     'n_outputs': 5,
+                     'args': {'d_model': 512,
+                              'reg_args': None,
+                              'norm_args': None,
+                              'reg_vals': [0],
+                              'seed': seed,
+                              'is_prob': False,
+                              'show_calls': False,
+                              'log_config': log_config['models']}}]
 
-trans_config = {'name': 'trans',
-                'n_epochs': n_epochs,
-                'n_chains': trans_n_chains,
-                'model_config': trans_model_config,
-                'data_config': data_config,
-                'build_config': build_config,
-                'opt_config': opt_config,
-                'loss_config': loss_config,
-                'metrics_config': metrics_config,
-                'run_config': run_config,
-                'save_config': save_config}
+dnn_config = {'name': 'DNN',
+              'n_epochs': n_epochs,
+              'n_chains': dnn_n_chains,
+              'model_config': dnn_model_config,
+              'data_config': data_config,
+              'build_config': build_config,
+              'opt_config': opt_config,
+              'loss_config': loss_config,
+              'metrics_config': metrics_config,
+              'run_config': run_config,
+              'save_config': save_config}
 
 # endregion:
 
@@ -1255,13 +1257,13 @@ ens_opt_config = [{'fn': optimizers.AdamDynamic,
                    'args': {'lr_st': 0.025,
                             'lr_min': 1e-7,
                             'decay_rate': 1.25,
-                            'static_epochs': [1,2]}},
+                            'static_epochs': [1, 2]}},
 
                   {'fn': optimizers.AdamDynamic,
                    'args': {'lr_st': 0.02,
                             'lr_min': 1e-7,
                             'decay_rate': 1.25,
-                            'static_epochs': [1,2]}},
+                            'static_epochs': [1, 2]}},
 
                   {'fn': optimizers.AdamDynamic,
                    'args': {'lr_st': 0.015,
@@ -1279,13 +1281,13 @@ ens_opt_config = [{'fn': optimizers.AdamDynamic,
                    'args': {'lr_st': 0.01,
                             'lr_min': 1e-7,
                             'decay_rate': 1.25,
-                            'static_epochs': [1,2]}}]
+                            'static_epochs': [1, 2]}}]
 
 ens_build_config = [{'strat_type': None,
                      'dist_type': None,
                      'pre_build': True,
-                     'load_cp': True,
-                     'save_cp': True}]
+                     'load_cp': load_cp,
+                     'save_cp': save_cp}]
 
 ens_loss_config = [{'fn': losses.categorical_crossentropy,
                     'args': {'from_logits': True,
@@ -1309,12 +1311,11 @@ ens_save_config = [{'features': None,
 
 ens_run_config = [{'run_type': 'fit',
                    'data_type': 'train',
-                   'val_on': True,
-                   'metrics_on': True,
+                   'val_on': val_on,
+                   'metrics_on': metrics_on,
                    'pre_build': True,
-                   'load_cp': True,
-                   'save_cp': True,
-                   'async_on': False,
+                   'load_cp': load_cp,
+                   'save_cp': save_cp,
                    'msgs_on': True}]
 
 ens_config = {'name': 'Ens',
@@ -1325,7 +1326,7 @@ ens_config = {'name': 'Ens',
               'build_config': ens_build_config,
               'opt_config': ens_opt_config,
               'loss_config': ens_loss_config,
-              'metrics_config':ens_metrics_config,
+              'metrics_config': ens_metrics_config,
               'run_config': ens_run_config,
               'save_config': ens_save_config}
 
@@ -1336,6 +1337,36 @@ ens_config = {'name': 'Ens',
 prob_n_chains = 1
 
 prob_model_config = [{'model': prob_models.Prob_1,
+                      'n_models': 1,
+                      'n_outputs': 5,
+                      'args': {'d_model': 512,
+                               'reg_args': None,
+                               'norm_args': None,
+                               'reg_vals': [0],
+                               'seed': seed,
+                               'is_prob': False,
+                               'show_calls': False,
+                               'log_config': log_config['models']}}]
+
+prob_config = {'name': 'prob',
+               'n_epochs': n_epochs,
+               'n_chains': prob_n_chains,
+               'model_config': prob_model_config,
+               'data_config': data_config,
+               'build_config': build_config,
+               'opt_config': opt_config,
+               'loss_config': loss_config,
+               'metrics_config': metrics_config,
+               'run_config': run_config,
+               'save_config': save_config}
+
+# endregion:
+
+# region: ........ Transformers ........ #
+
+trans_n_chains = 1
+
+trans_model_config = [{'model': trans_models.Transformer_2,
                        'n_models': 1,
                        'n_outputs': 5,
                        'args': {'d_model': 512,
@@ -1347,10 +1378,10 @@ prob_model_config = [{'model': prob_models.Prob_1,
                                 'show_calls': False,
                                 'log_config': log_config['models']}}]
 
-prob_config = {'name': 'prob',
+trans_config = {'name': 'trans',
                 'n_epochs': n_epochs,
-                'n_chains': prob_n_chains,
-                'model_config': prob_model_config,
+                'n_chains': trans_n_chains,
+                'model_config': trans_model_config,
                 'data_config': data_config,
                 'build_config': build_config,
                 'opt_config': opt_config,
