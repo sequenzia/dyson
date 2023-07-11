@@ -286,13 +286,12 @@ class Transformer_2(photon_models.Models):
 
 
         z_enc_stack = self.enc_stack(z_enc_bars)
+        z_dec_stack = self.dec_stack([z_dec_bars,z_enc_stack])
 
-        # z_dec_stack = self.dec_stack([z_dec_bars,z_enc_stack])
+        z_trans_out = self.trans_out(z_dec_stack)
 
-        z_pool = self.pool(z_enc_stack)
+        z_pool = self.pool(z_trans_out)
         z_out = self.dnn_out(z_pool)
-
-        # z_out = self.trans_out(z_enc_bars)
 
         self.z_return = {'features': inputs,
                          'y_hat': z_out,

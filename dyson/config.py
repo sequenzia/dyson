@@ -11,7 +11,7 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 500
+n_epochs = 100
 
 # region: ************** Network ************** #
 
@@ -1043,7 +1043,7 @@ tree_config = {'name': 'Base',
 
 log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
               'models': {'log_calls': {'main': False, 'val': False},
-                         'log_layers': {'main': True, 'val': False},
+                         'log_layers': {'main': False, 'val': False},
                          'log_run_data': {'main': False, 'val': False},
                          'log_theta': False}}
 
@@ -1059,10 +1059,10 @@ build_config = [{'strat_type': None,
                  'save_cp': save_cp}]
 
 opt_config = [{'fn': optimizers.AdamDynamic,
-               'args': {'lr_st': 0.01,
+               'args': {'lr_st': 0.001,
                         'lr_min': 1e-8,
-                        'decay_rate': 1.25,
-                        'static_epochs': [2, 2]}}]
+                        'decay_rate': 1.5,
+                        'static_epochs': [5, 2]}}]
 
 loss_config = [{'fn': losses.categorical_crossentropy,
                 'args': {'from_logits': False,
