@@ -29,7 +29,7 @@ branch = photon.Branches(trees=[tree], **config.trans_config)
 
 run = net.gamma.run_network(branches=[branch])
 
-loss_data = run.run_data[0]
+# loss_data = run.run_data[0]
 
-plot_loss(loss_data)
+# plot_loss(loss_data)
 

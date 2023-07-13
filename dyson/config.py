@@ -11,7 +11,7 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 100
+n_epochs = 1
 
 # region: ************** Network ************** #
 
@@ -1041,9 +1041,9 @@ tree_config = {'name': 'Base',
 
 # region: ************** Branch **************  #
 
-log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
+log_config = {'data': {'log_batch_data': {'main': True, 'val': False}},
               'models': {'log_calls': {'main': False, 'val': False},
-                         'log_layers': {'main': False, 'val': False},
+                         'log_layers': {'main': True, 'val': False},
                          'log_run_data': {'main': False, 'val': False},
                          'log_theta': False}}
 
@@ -1366,7 +1366,7 @@ prob_config = {'name': 'prob',
 
 trans_n_chains = 1
 
-trans_model_config = [{'model': trans_models.Transformer_2,
+trans_model_config = [{'model': trans_models.Transformer_3,
                        'n_models': 1,
                        'n_outputs': 5,
                        'args': {'d_model': 512,

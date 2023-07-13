@@ -300,3 +300,233 @@ class Transformer_2(photon_models.Models):
                          'y_tracking': None}
 
         return self.z_return
+
+class Transformer_3(photon_models.Models):
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+    def build_model(self, **kwargs):
+
+        n_heads = 1
+        n_blocks = 3
+        split_heads = False
+
+        drop_rate = 0
+
+        reg_config = None
+        norm_config = None
+
+        act_fn = activations.selu
+
+        k_reg = None # regularizers.L2()
+        b_reg = None
+        a_reg = None # regularizers.L1()
+
+        # ----- configs ----- #
+
+        k_init = initializers.GlorotUniform(self.seed)
+
+        bars_cnn_args = {'filters': self.d_model,
+                         'kernel_size': 3,
+                         'strides': 1,
+                         'padding': 'causal',
+                         'dilation_rate': 1,
+                         'activation': act_fn,
+                         'kernel_initializer': k_init,
+                         'use_bias': True,
+                         'bias_initializer': initializers.Zeros(),
+                         'kernel_regularizer':  k_reg,
+                         'bias_regularizer': b_reg,
+                         'activity_regularizer': a_reg,
+                         'kernel_constraint': None,
+                         'bias_constraint': None,
+                         'trainable': True}
+
+        bars_config = {'tracking_on': False,
+                       'sin_pe_on': False,
+                       'seq_pe_on': False,
+                       'intra_pe_on': False,
+                       'sub_type': 'cnn',
+                       'sub_args': bars_cnn_args,
+                       'n_layers': 1,
+                       'output_type': 'single',
+                       'kernel_size': 'units',
+                       'seq_scale': 0,
+                       'logs_on': False}
+
+        out_args = {'units': 5,
+                    'activation': None,
+                    'use_bias': True,
+                    'kernel_initializer': k_init,
+                    'bias_initializer': initializers.Zeros(),
+                    'kernel_regularizer': k_reg,
+                    'bias_regularizer': b_reg,
+                    'activity_regularizer': a_reg,
+                    'kernel_constraint': None,
+                    'bias_constraint': None,
+                    'trainable': True}
+
+        res_dnn_args = {'units': 5,
+                        'activation': None,
+                        'use_bias': True,
+                        'kernel_initializer': k_init,
+                        'bias_initializer': initializers.Zeros(),
+                        'kernel_regularizer': k_reg,
+                        'bias_regularizer': b_reg,
+                        'activity_regularizer': a_reg,
+                        'kernel_constraint': None,
+                        'bias_constraint': None,
+                        'trainable': True}
+
+        enc_res_config = {'cols_match': False,
+                          'depth_match': False,
+                          'dnn_args': res_dnn_args,
+                          'w_on': False,
+                          'act_fn': None,
+                          'init_fn': None,
+                          'w_reg': None,
+                          'b_reg': None,
+                          'a_reg': None,
+                          'pool_on': False,
+                          'pool_type': None,
+                          'res_drop': 0,
+                          'res_norm': 0}
+
+        attn_args = {'attn_units': self.d_model,
+                     'k_init': k_init,
+                     'use_bias': True,
+                     'b_init': initializers.Zeros(),
+                     'act_fn': None,
+                     'w_reg': None,
+                     'b_reg': None,
+                     'a_reg': None,
+                     'logs_on': False}
+
+        enc_block_args = {'n_heads': n_heads,
+                          'd_model': self.d_model,
+                          'attn_args': attn_args,
+                          'split_heads': split_heads,
+                          'lah_mask_on': False,
+                          'log_scores': False,
+                          'dff': self.d_model,
+                          'res_config': enc_res_config}
+
+        dec_block_args = {'n_heads': n_heads,
+                          'd_model': self.d_model,
+                          'attn_args': attn_args,
+                          'split_heads': split_heads,
+                          'lah_mask_on': False,
+                          'log_scores': False,
+                          'dff': self.d_model,
+                          'res_config': enc_res_config}
+
+        dnn_out_args = {'units': 5,
+                        'activation': None,
+                        'use_bias': True,
+                        'kernel_initializer': k_init,
+                        'bias_initializer': initializers.Zeros(),
+                        'kernel_regularizer': k_reg,
+                        'bias_regularizer': b_reg,
+                        'activity_regularizer': a_reg,
+                        'kernel_constraint': None,
+                        'bias_constraint': None,
+                        'trainable': True}
+
+        # -------- bars -------- #
+
+        self.enc_bars = trans_layers.EncBars(self.gauge,
+                                             layer_nm='enc_bars',
+                                             bars_config=bars_config,
+                                             reg_config=None,
+                                             norm_config=None)
+
+        # self.dec_bars = trans_layers.EncBars(self.gauge,
+        #                                      layer_nm='dec_bars',
+        #                                      bars_config=bars_config,
+        #                                      reg_config=None,
+        #                                      norm_config=None)
+
+        # self.dec_bars = trans_layers.DecBars(self.gauge,
+        #                                      layer_nm='dec_bars',
+        #                                      d_model=self.d_model,
+        #                                      sin_pe_on=False,
+        #                                      logs_on=True,
+        #                                      reg_config=None,
+        #                                      norm_config=None)
+
+        # ----- encoder ----- #
+
+        self.enc_stack = trans_layers.EncoderStack(self.gauge,
+                                                   layer_nm='enc_stk',
+                                                   n_blocks=n_blocks,
+                                                   block_args=enc_block_args,
+                                                   logs_on=False,
+                                                   reg_config=reg_config,
+                                                   norm_config=norm_config)
+
+        self.dec_stack = trans_layers.DecoderStack(self.gauge,
+                                                   layer_nm='dec_stack',
+                                                   n_blocks=n_blocks,
+                                                   block_args=dec_block_args,
+                                                   logs_on=False,
+                                                   reg_config=reg_config,
+                                                   norm_config=norm_config)
+
+        self.trans_out = trans_layers.TransOut(self.gauge,
+                                               layer_nm='out',
+                                               dnn_args=out_args,
+                                               reg_config=None,
+                                               norm_config=None)
+
+        self.pool = photon_layers.Pool(self.gauge,
+                                       layer_nm='pool',
+                                       pool_type='avg',
+                                       is_global=True,
+                                       reg_args=self.reg_args,
+                                       norm_args=self.norm_args)
+
+        self.dnn_out = photon_layers.DNN(self.gauge,
+                                         layer_nm='dnn_out',
+                                         layer_args=dnn_out_args,
+                                         reg_args=None,
+                                         norm_args=None)
+
+    def call(self, inputs, **kwargs):
+
+        targets = args_key_chk(kwargs,'targets')
+        tracking = args_key_chk(kwargs, 'tracking')
+
+        if targets is None:
+            targets = inputs
+
+        if tracking is None:
+            tracking = inputs
+
+        # print(f"targets -> {targets}")
+
+        z_enc_bars = self.enc_bars(inputs)
+        # z_dec_bars = self.dec_bars(targets)
+
+        # z_enc_stack = self.enc_stack(z_enc_bars)
+
+
+        print(f"z_enc_bars -> {z_enc_bars.shape}")
+        # print(f"z_dec_bars -> {z_dec_bars.shape}")
+        # print(f"z_enc_stack -> {z_enc_stack.shape}")
+
+        # z_dec_stack = self.dec_stack([z_dec_bars, z_enc_stack])
+
+        # z_trans_out = self.trans_out(z_enc_bars)
+
+        z_pool = self.pool(z_enc_bars)
+        z_out = self.dnn_out(z_pool)
+
+        self.z_return = {'features': inputs,
+                         'y_hat': z_out,
+                         'y_true': None,
+                         'x_tracking': None,
+                         'y_tracking': None}
+
+        return self.z_return
