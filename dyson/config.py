@@ -11,7 +11,7 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 1
+n_epochs = 200
 
 # region: ************** Network ************** #
 
@@ -962,7 +962,7 @@ network_config = {'photon_id': photon_id,
 
 batch_size = 100
 
-train_days = 100
+train_days = 200
 test_days = 50
 val_days = 100
 
@@ -997,7 +997,7 @@ seq_days = 1
 seq_len = 390
 agg = 5
 
-val_on = False
+val_on = True
 test_on = False
 metrics_on = False
 
@@ -1041,9 +1041,9 @@ tree_config = {'name': 'Base',
 
 # region: ************** Branch **************  #
 
-log_config = {'data': {'log_batch_data': {'main': True, 'val': False}},
+log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
               'models': {'log_calls': {'main': False, 'val': False},
-                         'log_layers': {'main': True, 'val': False},
+                         'log_layers': {'main': False, 'val': False},
                          'log_run_data': {'main': False, 'val': False},
                          'log_theta': False}}
 
@@ -1061,12 +1061,18 @@ build_config = [{'strat_type': None,
 opt_config = [{'fn': optimizers.AdamDynamic,
                'args': {'lr_st': 0.001,
                         'lr_min': 1e-8,
-                        'decay_rate': 1.5,
-                        'static_epochs': [5, 2]}}]
+                        'decay_rate': 1.25,
+                        'static_epochs': [2, 2]}}]
 
-loss_config = [{'fn': losses.categorical_crossentropy,
-                'args': {'from_logits': False,
-                         'reduction': 'none'}}]
+
+
+
+loss_config = [{'fn': losses.mean_squared_error,
+                'args': {'reduction': 'none'}}]
+
+# loss_config = [{'fn': losses.categorical_crossentropy,
+#                 'args': {'from_logits': False,
+#                          'reduction': 'none'}}]
 
 metrics_config = [{'fn': metrics.AUC,
                    'args': {"from_logits": False}},
@@ -1368,7 +1374,7 @@ trans_n_chains = 1
 
 trans_model_config = [{'model': trans_models.Transformer_3,
                        'n_models': 1,
-                       'n_outputs': 5,
+                       'n_outputs': 10,
                        'args': {'d_model': 512,
                                 'reg_args': None,
                                 'norm_args': None,

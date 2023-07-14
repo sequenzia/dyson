@@ -1,5 +1,3 @@
-import sys
-import os
 from dyson import config
 from photon import Photon
 from photon import plot_loss
@@ -29,7 +27,4 @@ branch = photon.Branches(trees=[tree], **config.trans_config)
 
 run = net.gamma.run_network(branches=[branch])
 
-# loss_data = run.run_data[0]
-
-# plot_loss(loss_data)
-
+plot_loss(run.run_data[0])

@@ -4,6 +4,7 @@ from tensorflow.keras import layers as tf_layers
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from photon.utils import args_key_chk
 
+
 class Transformer_1(photon_models.Models):
 
     def __init__(self, **kwargs):
@@ -21,20 +22,20 @@ class Transformer_1(photon_models.Models):
         k_init = initializers.GlorotUniform(seed=self.seed)
 
         rnn_args = {'units': self.d_model,
-                      'activation': activations.tanh,
-                      'recurrent_activation': 'sigmoid',
-                      'kernel_initializer': k_init,
-                      'recurrent_initializer': initializers.Orthogonal(seed=self.seed),
-                      'use_bias': True,
-                      'bias_initializer': initializers.Zeros(),
-                      'kernel_regularizer': k_reg,
-                      'recurrent_regularizer': k_reg,
-                      'bias_regularizer': b_reg,
-                      'dropout': self.drop_rate,
-                      'stateful': False,
-                      'unroll': False,
-                      'return_sequences': True,
-                      'return_state': False}
+                    'activation': activations.tanh,
+                    'recurrent_activation': 'sigmoid',
+                    'kernel_initializer': k_init,
+                    'recurrent_initializer': initializers.Orthogonal(seed=self.seed),
+                    'use_bias': True,
+                    'bias_initializer': initializers.Zeros(),
+                    'kernel_regularizer': k_reg,
+                    'recurrent_regularizer': k_reg,
+                    'bias_regularizer': b_reg,
+                    'dropout': self.drop_rate,
+                    'stateful': False,
+                    'unroll': False,
+                    'return_sequences': True,
+                    'return_state': False}
 
         dnn_out_args = {'units': 5,
                         'activation': None,
@@ -85,6 +86,7 @@ class Transformer_1(photon_models.Models):
 
         return self.z_return
 
+
 class Transformer_2(photon_models.Models):
 
     def __init__(self, **kwargs):
@@ -104,9 +106,9 @@ class Transformer_2(photon_models.Models):
 
         act_fn = activations.selu
 
-        k_reg = None # regularizers.L2()
+        k_reg = None  # regularizers.L2()
         b_reg = None
-        a_reg = None # regularizers.L1()
+        a_reg = None  # regularizers.L1()
 
         # ----- configs ----- #
 
@@ -273,7 +275,7 @@ class Transformer_2(photon_models.Models):
 
     def call(self, inputs, **kwargs):
 
-        targets = args_key_chk(kwargs,'targets')
+        targets = args_key_chk(kwargs, 'targets')
         tracking = args_key_chk(kwargs, 'tracking')
 
         if targets is None:
@@ -284,9 +286,8 @@ class Transformer_2(photon_models.Models):
         z_enc_bars = self.enc_bars(inputs)
         z_dec_bars = self.dec_bars(inputs)
 
-
         z_enc_stack = self.enc_stack(z_enc_bars)
-        z_dec_stack = self.dec_stack([z_dec_bars,z_enc_stack])
+        z_dec_stack = self.dec_stack([z_dec_bars, z_enc_stack])
 
         z_trans_out = self.trans_out(z_dec_stack)
 
@@ -300,6 +301,7 @@ class Transformer_2(photon_models.Models):
                          'y_tracking': None}
 
         return self.z_return
+
 
 class Transformer_3(photon_models.Models):
 
@@ -320,9 +322,9 @@ class Transformer_3(photon_models.Models):
 
         act_fn = activations.selu
 
-        k_reg = None # regularizers.L2()
+        k_reg = None  # regularizers.L2()
         b_reg = None
-        a_reg = None # regularizers.L1()
+        a_reg = None  # regularizers.L1()
 
         # ----- configs ----- #
 
@@ -422,7 +424,7 @@ class Transformer_3(photon_models.Models):
                           'dff': self.d_model,
                           'res_config': enc_res_config}
 
-        dnn_out_args = {'units': 5,
+        dnn_out_args = {'units': 10,
                         'activation': None,
                         'use_bias': True,
                         'kernel_initializer': k_init,
@@ -442,19 +444,11 @@ class Transformer_3(photon_models.Models):
                                              reg_config=None,
                                              norm_config=None)
 
-        # self.dec_bars = trans_layers.EncBars(self.gauge,
-        #                                      layer_nm='dec_bars',
-        #                                      bars_config=bars_config,
-        #                                      reg_config=None,
-        #                                      norm_config=None)
-
-        # self.dec_bars = trans_layers.DecBars(self.gauge,
-        #                                      layer_nm='dec_bars',
-        #                                      d_model=self.d_model,
-        #                                      sin_pe_on=False,
-        #                                      logs_on=True,
-        #                                      reg_config=None,
-        #                                      norm_config=None)
+        self.dec_bars = trans_layers.EncBars(self.gauge,
+                                             layer_nm='dec_bars',
+                                             bars_config=bars_config,
+                                             reg_config=None,
+                                             norm_config=None)
 
         # ----- encoder ----- #
 
@@ -495,7 +489,7 @@ class Transformer_3(photon_models.Models):
 
     def call(self, inputs, **kwargs):
 
-        targets = args_key_chk(kwargs,'targets')
+        targets = args_key_chk(kwargs, 'targets')
         tracking = args_key_chk(kwargs, 'tracking')
 
         if targets is None:
@@ -504,23 +498,15 @@ class Transformer_3(photon_models.Models):
         if tracking is None:
             tracking = inputs
 
-        # print(f"targets -> {targets}")
-
         z_enc_bars = self.enc_bars(inputs)
-        # z_dec_bars = self.dec_bars(targets)
+        z_dec_bars = self.dec_bars(targets)
 
-        # z_enc_stack = self.enc_stack(z_enc_bars)
+        z_enc_stack = self.enc_stack(z_enc_bars)
+        z_dec_stack = self.dec_stack([z_dec_bars, z_enc_stack])
 
+        # z_trans_out = self.trans_out(z_dec_stack)
 
-        print(f"z_enc_bars -> {z_enc_bars.shape}")
-        # print(f"z_dec_bars -> {z_dec_bars.shape}")
-        # print(f"z_enc_stack -> {z_enc_stack.shape}")
-
-        # z_dec_stack = self.dec_stack([z_dec_bars, z_enc_stack])
-
-        # z_trans_out = self.trans_out(z_enc_bars)
-
-        z_pool = self.pool(z_enc_bars)
+        z_pool = self.pool(z_dec_stack)
         z_out = self.dnn_out(z_pool)
 
         self.z_return = {'features': inputs,

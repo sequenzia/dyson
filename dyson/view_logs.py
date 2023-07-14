@@ -27,7 +27,9 @@ targets = batch_logs[0][0]['targets']
 tracking = batch_logs[0][0]['tracking']
 outputs = batch_logs[0][0]['outputs']
 
+import tensorflow as tf
 
+outputs[:,-1,:]
 
 inputs[0][:25]
 

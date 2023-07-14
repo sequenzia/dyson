@@ -6,6 +6,9 @@ src_chain = run_chain.src
 
 run_model = run_chain.models[0]
 
+
+run_model.steps.y_hat
+
 tree = src_branch.trees[0]
 
 gauge = src_chain.models[0]
