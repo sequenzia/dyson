@@ -11,7 +11,7 @@ options = options.get_options()
 
 photon_id = 0
 
-n_epochs = 200
+n_epochs = 1
 
 # region: ************** Network ************** #
 
@@ -962,7 +962,7 @@ network_config = {'photon_id': photon_id,
 
 batch_size = 100
 
-train_days = 200
+train_days = 100
 test_days = 50
 val_days = 100
 
@@ -995,9 +995,9 @@ masking = {'blocks': {'train': {'mask': utils.config_block_mask(),
 seq_days = 1
 
 seq_len = 390
-agg = 5
+agg = 1
 
-val_on = True
+val_on = False
 test_on = False
 metrics_on = False
 
@@ -1041,7 +1041,7 @@ tree_config = {'name': 'Base',
 
 # region: ************** Branch **************  #
 
-log_config = {'data': {'log_batch_data': {'main': False, 'val': False}},
+log_config = {'data': {'log_batch_data': {'main': True, 'val': False}},
               'models': {'log_calls': {'main': False, 'val': False},
                          'log_layers': {'main': False, 'val': False},
                          'log_run_data': {'main': False, 'val': False},
@@ -1063,8 +1063,6 @@ opt_config = [{'fn': optimizers.AdamDynamic,
                         'lr_min': 1e-8,
                         'decay_rate': 1.25,
                         'static_epochs': [2, 2]}}]
-
-
 
 
 loss_config = [{'fn': losses.mean_squared_error,
@@ -1111,8 +1109,9 @@ dnn_n_chains = 1
 
 dnn_model_config = [{'model': dnn_models.DNN_Base,
                      'n_models': 1,
-                     'n_outputs': 5,
+                     'n_outputs': 10,
                      'args': {'d_model': 512,
+                              'n_outputs': 10,
                               'reg_args': None,
                               'norm_args': None,
                               'reg_vals': [0],

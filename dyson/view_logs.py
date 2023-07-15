@@ -20,16 +20,37 @@ gauge = chain.models[model_idx]
 
 batch_logs = chain.logs.batch_data['main']
 
-batch_logs[0][0].keys()
 
 inputs = batch_logs[0][0]['inputs']
 targets = batch_logs[0][0]['targets']
 tracking = batch_logs[0][0]['tracking']
 outputs = batch_logs[0][0]['outputs']
 
-import tensorflow as tf
+inputs.shape
+targets.shape
+tracking.shape
+outputs.shape
 
-outputs[:,-1,:]
+features = inputs[:, :, :-7]
+
+sum(features[0])
+sum(outputs[0])
+
+
+run_steps = run.branches[branch_idx].chains[chain_idx].models[model_idx].steps
+
+len(run_steps.y_true[0])
+
+tree.data.store['train'].keys()
+
+tree.data.store['train']['full_bars'].shape
+
+tree.data.store['train']['raw']['full_bars'].shape
+
+tree.data.store['train']['model_bars'].shape
+
+
+outputs[:, -1, :]
 
 inputs[0][:25]
 
@@ -62,7 +83,6 @@ layer_logs = gauge.logs.layers['main'][0][0][2]
 print(layer_logs['layer_name'])
 print(layer_logs['in_shape'])
 print(layer_logs['out_shape'])
-
 
 
 # --- Run Data Logs -- #

@@ -30,7 +30,7 @@ class DNN_Base(photon_models.Models):
                     'bias_constraint': None,
                     'trainable': True}
 
-        dnn_out_args = {'units': 5,
+        dnn_out_args = {'units': self.n_outputs,
                         'activation': activations.softmax,
                         'use_bias': True,
                         'kernel_initializer': initializers.GlorotUniform(seed=self.seed),

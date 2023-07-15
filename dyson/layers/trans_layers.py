@@ -1,8 +1,10 @@
 from photon import layers as photon_layers
-import tensorflow as tf, numpy as np
+import tensorflow as tf
+import numpy as np
 from tensorflow.keras import layers as tf_layers
 from tensorflow import math as tfm
 from photon.utils import np_exp, args_key_chk
+
 
 class EncBars(photon_layers.Layers):
 
@@ -256,12 +258,10 @@ class EncBars(photon_layers.Layers):
 
         # -- all: output_type -- #
         if self.output_type == 'all':
-
             z_outputs = z_layers
 
         # -- single: output_type -- #
         if self.output_type == 'single':
-
             z_outputs = tf.concat(z_layers, axis=1, name='z_outputs')
 
         # -- split_a: output_type -- #
@@ -317,9 +317,8 @@ class EncBars(photon_layers.Layers):
         pe_data = np.zeros((self.seq_depth, self.n_cols))
         pos = np.expand_dims(np.arange(self.seq_depth), axis=-1)
 
-        pe_data[0::2] = np.repeat(np.sin(pos),self.n_cols, axis=-1)[0::2]
-        pe_data[1::2] = np.repeat(np.cos(pos),self.n_cols, axis=-1)[1::2]
-
+        pe_data[0::2] = np.repeat(np.sin(pos), self.n_cols, axis=-1)[0::2]
+        pe_data[1::2] = np.repeat(np.cos(pos), self.n_cols, axis=-1)[1::2]
 
         # pe_data = np.repeat(np.expand_dims(pe_data, axis=0), self.batch_size, axis=0)
 
@@ -330,7 +329,7 @@ class EncBars(photon_layers.Layers):
         pos = np.expand_dims(np.arange(self.seq_depth), axis=-1)
 
         mm_args = {
-            'feature_range': (0,1),
+            'feature_range': (0, 1),
             'copy': True,
             'clip': False}
 
@@ -344,12 +343,12 @@ class EncBars(photon_layers.Layers):
 
     def gen_intra_pe(self, tracking):
 
-        t_data = tf.squeeze(tracking[:,:,7:8])
+        t_data = tf.squeeze(tracking[:, :, 7:8])
 
-        t_data = (t_data -390)
+        t_data = (t_data - 390)
 
         mm_args = {
-            'feature_range': (0,1),
+            'feature_range': (0, 1),
             'copy': True,
             'clip': False}
 
@@ -358,6 +357,7 @@ class EncBars(photon_layers.Layers):
         pe_data = np.repeat(np.expand_dims(mm_trans.fit_transform(t_data), -1), self.n_cols, axis=-1)
 
         return tf.convert_to_tensor(pe_data, name='z_intra_pe')
+
 
 class DecBars(photon_layers.Layers):
 
@@ -410,8 +410,6 @@ class DecBars(photon_layers.Layers):
 
         if self.gauge.is_model_built:
 
-
-
             z_sin_pe = None
             z_seq_pe = None
             z_intra_pe = None
@@ -425,7 +423,7 @@ class DecBars(photon_layers.Layers):
                 z_data = z_data + z_sin_pe
 
             z_data = np.roll(z_data, 1, axis=1)
-            z_data[:,0] = 0
+            z_data[:, 0] = 0
             z_outputs = tf.convert_to_tensor(z_data, dtype=self.gauge_dtype)
 
             if self.logs_on:
@@ -457,6 +455,7 @@ class DecBars(photon_layers.Layers):
         pe_data = np.repeat(np.expand_dims(pe_data, axis=0), self.batch_size, axis=0)
 
         return tf.convert_to_tensor(pe_data, name='z_sin_pe_o')
+
 
 class DecBars_2(photon_layers.Layers):
 
@@ -525,7 +524,7 @@ class DecBars_2(photon_layers.Layers):
                 z_data = z_data + z_sin_pe
 
             z_data = np.roll(z_data, 1, axis=1)
-            z_data[:,0] = 0
+            z_data[:, 0] = 0
             z_outputs = tf.convert_to_tensor(z_data, dtype=self.gauge_dtype)
 
             if self.logs_on:
@@ -559,6 +558,7 @@ class DecBars_2(photon_layers.Layers):
         return tf.convert_to_tensor(pe_data, name='z_sin_pe_o')
 
 # -- Transformer -- #
+
 
 class TauEmbed(photon_layers.Layers):
 
@@ -643,6 +643,7 @@ class TauEmbed(photon_layers.Layers):
         self.logs.append(_log)
 
         return z_data
+
 
 class AttnEmbed(photon_layers.Layers):
 
@@ -741,10 +742,10 @@ class AttnEmbed(photon_layers.Layers):
         d_model = data_shp[-1]
 
         pe_data = np.zeros((seq_len, d_model))
-        pos = np.expand_dims(np.arange(1,seq_len+1), axis=-1)
+        pos = np.expand_dims(np.arange(1, seq_len+1), axis=-1)
 
-        pe_data[0::2] = np.repeat(np.sin(pos),d_model, axis=-1)[0::2]
-        pe_data[1::2] = np.repeat(np.cos(pos),d_model, axis=-1)[1::2]
+        pe_data[0::2] = np.repeat(np.sin(pos), d_model, axis=-1)[0::2]
+        pe_data[1::2] = np.repeat(np.cos(pos), d_model, axis=-1)[1::2]
 
         pe_data = np.repeat(np.expand_dims(pe_data, axis=0), batch_size, axis=0)
 
@@ -776,6 +777,7 @@ class AttnEmbed(photon_layers.Layers):
         self.seq_mask.append(_seq_mask)
 
         return _seq_mask
+
 
 class Attn(photon_layers.Layers):
 
@@ -881,7 +883,7 @@ class Attn(photon_layers.Layers):
 
         attn_output = tf.matmul(attn_sc_4, z_value)
 
-        return [attn_output, [attn_sc_1,attn_sc_2,attn_sc_3,attn_sc_4]]
+        return [attn_output, [attn_sc_1, attn_sc_2, attn_sc_3, attn_sc_4]]
 
     def gen_lah_mask(self, seq_len):
         mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len), dtype=np.float64), -1, 0)
@@ -890,6 +892,7 @@ class Attn(photon_layers.Layers):
     def gen_pad_mask(self, seq_data):
         seq = tf.cast(tf.math.equal(seq_data, 0), tf.float32)
         return seq[:, tf.newaxis, tf.newaxis, :]
+
 
 class AttnHeads(photon_layers.Layers):
 
@@ -999,6 +1002,7 @@ class AttnHeads(photon_layers.Layers):
 
         return self.heads_out(z_output, training)
 
+
 class EncoderBlock(photon_layers.Layers):
 
     def __init__(self, gauge, layer_nm, n_heads, d_model, attn_args, split_heads, lah_mask_on, log_scores, dff, res_config, **kwargs):
@@ -1055,7 +1059,8 @@ class EncoderBlock(photon_layers.Layers):
         self.sah = AttnHeads(gauge=self.gauge, layer_nm=self.sah_nm, is_child=True, **self.sah_args)
 
         # -- add first res layer -- #
-        self.res_1 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_1_nm, res_config=self.res_config, is_child=True)
+        self.res_1 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_1_nm,
+                                       res_config=self.res_config, is_child=True)
 
         # -- add first ffn layer -- #
         self.ffn_1 = photon_layers.DNN(gauge=self.gauge,
@@ -1087,6 +1092,7 @@ class EncoderBlock(photon_layers.Layers):
         z_res_2 = self.res_1([z_res_1, z_ffn_2], training)
 
         return z_res_2
+
 
 class DecoderBlock(photon_layers.Layers):
 
@@ -1152,7 +1158,8 @@ class DecoderBlock(photon_layers.Layers):
     def build(self, input_shp):
 
         # -- add first res layer -- #
-        self.res_1 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_1_nm, res_config=self.res_config, is_child=True)
+        self.res_1 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_1_nm,
+                                       res_config=self.res_config, is_child=True)
 
         # -- self attn heads -- #
         self.sah = AttnHeads(gauge=self.gauge, layer_nm=self.sah_nm, **self.sah_args)
@@ -1161,10 +1168,12 @@ class DecoderBlock(photon_layers.Layers):
         self.edah = AttnHeads(gauge=self.gauge, layer_nm=self.edah_nm, **self.edah_args)
 
         # -- add second res layer -- #
-        self.res_2 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_2_nm, res_config=self.res_config, is_child=True)
+        self.res_2 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_2_nm,
+                                       res_config=self.res_config, is_child=True)
 
         # -- add second res layer -- #
-        self.res_3 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_3_nm, res_config=self.res_config, is_child=True)
+        self.res_3 = photon_layers.Res(gauge=self.gauge, layer_nm=self.res_3_nm,
+                                       res_config=self.res_config, is_child=True)
 
         # -- add first ffn layer -- #
         self.ffn_1 = photon_layers.DNN(gauge=self.gauge,
@@ -1194,6 +1203,7 @@ class DecoderBlock(photon_layers.Layers):
         z_res_3 = self.res_3([z_ffn_2, z_res_2], training)
 
         return z_res_3
+
 
 class EncoderStack(photon_layers.Layers):
 
@@ -1241,6 +1251,7 @@ class EncoderStack(photon_layers.Layers):
             self.save_layer_log(_log)
 
         return z_enc_blocks[-1]
+
 
 class DecoderStack(photon_layers.Layers):
 
@@ -1297,6 +1308,7 @@ class DecoderStack(photon_layers.Layers):
 
         return z_dec_blocks[-1]
 
+
 class TransOut(photon_layers.Layers):
 
     def __init__(self, gauge, layer_nm, dnn_args, **kwargs):
@@ -1321,6 +1333,7 @@ class TransOut(photon_layers.Layers):
 
         return tf.matmul(z_filter, inputs)
 
+
 class TimeDis(photon_layers.Layers):
 
     def __init__(self, gauge, layer_nm, dis_layer, **kwargs):
@@ -1342,6 +1355,7 @@ class TimeDis(photon_layers.Layers):
         self.z_output = self.k_layer(inputs, training=training)
 
         return self.z_output
+
 
 class PosEnc(photon_layers.Layers):
 
@@ -1407,12 +1421,13 @@ class PosEnc(photon_layers.Layers):
                 'trend_data': self.trend_data,
                 'sin_dp': self.sin_dp,
                 'sin_data': self.sin_data}
-                # 'z_merge': self.z_merg}
-                # 'z_data': self.z_data}
+        # 'z_merge': self.z_merg}
+        # 'z_data': self.z_data}
 
         self.logs.append(_log)
 
         return self.features
+
 
 class DynamicEnc(photon_layers.Layers):
 
@@ -1440,10 +1455,10 @@ class DynamicEnc(photon_layers.Layers):
             nm = self.layer_nm + '_sub_' + str(idx)
 
             _layer = RNN(self.gauge,
-                        layer_nm=nm,
-                        rnn_type='lstm',
-                        rnn_args=self.sub_args,
-                        is_child=True)
+                         layer_nm=nm,
+                         rnn_type='lstm',
+                         rnn_args=self.sub_args,
+                         is_child=True)
 
             self.sub_layers.append(_layer)
 
